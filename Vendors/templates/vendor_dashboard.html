@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VendorBridge ERP - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "primary-container": "#6965db",
+                        "on-secondary-fixed": "#1b1b1c",
+                        "secondary-fixed": "#e5e2e1",
+                        "on-tertiary-fixed-variant": "#683c00",
+                        "surface-container": "#eaeef9",
+                        "on-primary-fixed": "#0f0069",
+                        "surface-variant": "#dee2ed",
+                        "surface-tint": "#534ec3",
+                        "surface": "#f8f9ff",
+                        "status-rejected": "#EF4444",
+                        "primary-fixed": "#e2dfff",
+                        "outline-variant": "#c7c4d5",
+                        "on-secondary-container": "#636262",
+                        "on-surface": "#171c23",
+                        "inverse-surface": "#2c3139",
+                        "on-primary": "#ffffff",
+                        "status-pending": "#F59E0B",
+                        "tertiary-fixed-dim": "#ffb86d",
+                        "primary": "#504bc0",
+                        "inverse-primary": "#c3c0ff",
+                        "surface-subtle": "#F4F7FF",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "tertiary-container": "#a86400",
+                        "surface-container-high": "#e4e8f3",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#e2dfde",
+                        "secondary": "#5f5e5e",
+                        "surface-dim": "#d6dae5",
+                        "status-info": "#3B82F6",
+                        "background": "#f8f9ff",
+                        "tertiary": "#864e00",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed": "#2c1600",
+                        "outline": "#777585",
+                        "on-secondary-fixed-variant": "#474746",
+                        "tertiary-fixed": "#ffdcbd",
+                        "border-low-contrast": "#E4E8F3",
+                        "status-approved": "#10B981",
+                        "surface-container-highest": "#dee2ed",
+                        "on-error-container": "#93000a",
+                        "on-primary-container": "#fefaff",
+                        "on-surface-variant": "#464553",
+                        "error": "#ba1a1a",
+                        "inverse-on-surface": "#edf1fc",
+                        "surface-bright": "#f8f9ff",
+                        "on-error": "#ffffff",
+                        "surface-container-low": "#f0f3ff",
+                        "on-tertiary-container": "#fffaff",
+                        "on-primary-fixed-variant": "#3a33ab",
+                        "error-container": "#ffdad6",
+                        "on-background": "#171c23"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "stack-sm": "8px",
+                        "stack-md": "16px",
+                        "base": "4px",
+                        "container-margin": "24px",
+                        "stack-lg": "32px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "data-tabular": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #dee2ed; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #c7c4d5; }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(228, 232, 243, 0.8);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-hidden">
+<aside class="fixed left-0 top-0 bottom-0 flex flex-col z-50 overflow-y-auto bg-surface-subtle border-r border-border-low-contrast w-64">
+<div class="px-6 py-8">
+<div class="flex items-center gap-3 mb-12">
+<div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-headline-sm" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-black text-primary leading-tight">VendorBridge</h1>
+<p class="font-label-md text-label-md text-secondary uppercase tracking-widest">Procurement Portal</p>
+</div>
+</div>
+<nav class="space-y-1">
+<!-- Dashboard Active -->
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg mx-2 my-1 transition-transform active:scale-95" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-variant rounded-lg mx-2 my-1 transition-all" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md">Vendors</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-variant rounded-lg mx-2 my-1 transition-all" href="#">
+<span class="material-symbols-outlined">request_quote</span>
+<span class="font-label-md text-label-md">RFQs</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-variant rounded-lg mx-2 my-1 transition-all" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-md text-label-md">Quotations</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-variant rounded-lg mx-2 my-1 transition-all" href="#">
+<span class="material-symbols-outlined">shopping_cart</span>
+<span class="font-label-md text-label-md">Orders</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-variant rounded-lg mx-2 my-1 transition-all" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-label-md text-label-md">Invoices</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-variant rounded-lg mx-2 my-1 transition-all" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-md text-label-md">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-variant rounded-lg mx-2 my-1 transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+</div>
+<div class="mt-auto border-t border-border-low-contrast p-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-variant rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">help_outline</span>
+<span class="font-label-md text-label-md">Help Center</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-error hover:bg-error-container rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Log Out</span>
+</a>
+</div>
+</aside>
+<div class="flex flex-col flex-1 ml-64 min-h-screen">
+<header class="flex justify-between items-center h-16 px-gutter w-full sticky top-0 z-40 bg-surface-container-lowest border-b border-border-low-contrast">
+<div class="flex items-center gap-stack-md flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full pl-10 pr-4 py-2 text-body-sm focus:ring-2 focus:ring-primary/20" placeholder="Search RFQs, Vendors, or Orders..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center text-secondary hover:bg-surface-container-low rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center text-secondary hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center text-secondary hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="h-8 w-px bg-border-low-contrast mx-2"></div>
+<div class="flex items-center gap-3 pl-2">
+<div class="text-right hidden lg:block">
+<p class="font-label-md text-label-md text-on-surface">Alex Thompson</p>
+<p class="text-[10px] text-secondary uppercase font-bold tracking-tighter">Sr. Procurement Officer</p>
+</div>
+<img alt="User Profile Avatar" class="w-10 h-10 rounded-full border-2 border-primary-fixed object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdBenVv_CMSBe7DV3oxClkIT-xkyx4v0GTaiHxKbe8kkglk4cNBdmRZrpNO3hjzKgbp9JkrvKLsxa4b3QbTHruKhy6_r7UlW6I2rxDSKybmoM2LH9v5ivjYbL3v-CWayKupDPi3nD9kkEC-jGeg4TrDsV2DJqb_3WPjyXrdJ5TfqVmv-AHv01vvSAFcslapKg55y8nAv-ZDGuVI5nDcFyB-ryfzkplwJMMoIAa_xMVFJAWt4Lq3An71lP5mH_3N3m1xMWgz7Re_EI"/>
+</div>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto p-gutter lg:p-10 space-y-stack-lg max-w-[1400px] mx-auto w-full">
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-stack-lg items-end">
+<div class="lg:col-span-8 space-y-2">
+<h2 class="font-headline-md text-headline-md text-on-surface">Welcome back, Procurement Officer</h2>
+<p class="font-body-md text-body-md text-secondary">You have <span class="text-primary font-bold">12 new quotations</span> to review today. Market trends show a 5% increase in logistics costs.</p>
+</div>
+<div class="lg:col-span-4 flex justify-end gap-3">
+<button class="bg-primary text-on-primary px-6 py-2.5 rounded-xl font-label-md text-label-md flex items-center gap-2 shadow-sm hover:opacity-90 transition-opacity active:scale-95">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                        Create New RFQ
+                    </button>
+<button class="bg-surface-container-lowest border border-border-low-contrast text-on-surface px-4 py-2.5 rounded-xl font-label-md text-label-md flex items-center gap-2 hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[20px]">file_download</span>
+                        Report
+                    </button>
+</div>
+</section>
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Analytics Card 1 -->
+<div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5 hover:border-primary-container transition-all">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-error-container text-on-error-container rounded-lg">
+<span class="material-symbols-outlined">pending_actions</span>
+</div>
+<span class="text-status-rejected font-label-md text-label-md bg-error-container/20 px-2 py-0.5 rounded-full">+3 today</span>
+</div>
+<p class="text-secondary font-label-md text-label-md">Pending Approvals</p>
+<p class="font-display-lg text-display-lg text-on-surface mt-1">24</p>
+</div>
+<!-- Analytics Card 2 -->
+<div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5 hover:border-primary-container transition-all">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-primary-fixed text-primary rounded-lg">
+<span class="material-symbols-outlined">campaign</span>
+</div>
+<span class="text-status-info font-label-md text-label-md bg-status-info/10 px-2 py-0.5 rounded-full">Active</span>
+</div>
+<p class="text-secondary font-label-md text-label-md">Active RFQs</p>
+<p class="font-display-lg text-display-lg text-on-surface mt-1">158</p>
+</div>
+<!-- Analytics Card 3 -->
+<div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5 hover:border-primary-container transition-all">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-status-approved/10 text-status-approved rounded-lg">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<span class="text-status-approved font-label-md text-label-md bg-status-approved/10 px-2 py-0.5 rounded-full">↑ 12%</span>
+</div>
+<p class="text-secondary font-label-md text-label-md">Total Monthly Spend</p>
+<p class="font-display-lg text-display-lg text-on-surface mt-1">$1.2M</p>
+</div>
+<!-- Analytics Card 4 -->
+<div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5 hover:border-primary-container transition-all">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-status-pending/10 text-status-pending rounded-lg">
+<span class="material-symbols-outlined">description</span>
+</div>
+<span class="text-status-pending font-label-md text-label-md bg-status-pending/10 px-2 py-0.5 rounded-full">New</span>
+</div>
+<p class="text-secondary font-label-md text-label-md">New Quotations</p>
+<p class="font-display-lg text-display-lg text-on-surface mt-1">42</p>
+</div>
+</section>
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-stack-lg">
+<section class="xl:col-span-8 space-y-stack-md">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Pending Approvals</h3>
+<button class="text-primary font-label-md text-label-md hover:underline">See All</button>
+</div>
+<div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-subtle border-b border-border-low-contrast">
+<tr>
+<th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Request ID</th>
+<th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Vendor</th>
+<th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Amount</th>
+<th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Date</th>
+<th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-low-contrast">
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4 font-data-tabular text-data-tabular">#RFQ-2024-001</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-variant flex items-center justify-center font-bold text-xs text-primary">GN</div>
+<span class="font-body-md text-body-md">Global Networks Inc.</span>
+</div>
+</td>
+<td class="px-6 py-4 font-data-tabular text-data-tabular">$45,200.00</td>
+<td class="px-6 py-4 font-body-sm text-body-sm text-secondary">Oct 12, 2023</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary font-label-md text-label-md px-3 py-1.5 rounded-lg border border-primary/20 hover:bg-primary hover:text-white transition-all">View Details</button>
+</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4 font-data-tabular text-data-tabular">#RFQ-2024-004</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-status-approved/10 flex items-center justify-center font-bold text-xs text-status-approved">SL</div>
+<span class="font-body-md text-body-md">Swift Logistics</span>
+</div>
+</td>
+<td class="px-6 py-4 font-data-tabular text-data-tabular">$12,850.00</td>
+<td class="px-6 py-4 font-body-sm text-body-sm text-secondary">Oct 14, 2023</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary font-label-md text-label-md px-3 py-1.5 rounded-lg border border-primary/20 hover:bg-primary hover:text-white transition-all">View Details</button>
+</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4 font-data-tabular text-data-tabular">#RFQ-2024-007</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-status-pending/10 flex items-center justify-center font-bold text-xs text-status-pending">AP</div>
+<span class="font-body-md text-body-md">Advanced Polymers</span>
+</div>
+</td>
+<td class="px-6 py-4 font-data-tabular text-data-tabular">$234,000.00</td>
+<td class="px-6 py-4 font-body-sm text-body-sm text-secondary">Oct 14, 2023</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary font-label-md text-label-md px-3 py-1.5 rounded-lg border border-primary/20 hover:bg-primary hover:text-white transition-all">View Details</button>
+</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4 font-data-tabular text-data-tabular">#RFQ-2024-009</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-status-info/10 flex items-center justify-center font-bold text-xs text-status-info">TS</div>
+<span class="font-body-md text-body-md">Tech Solutions</span>
+</div>
+</td>
+<td class="px-6 py-4 font-data-tabular text-data-tabular">$7,400.00</td>
+<td class="px-6 py-4 font-body-sm text-body-sm text-secondary">Oct 15, 2023</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary font-label-md text-label-md px-3 py-1.5 rounded-lg border border-primary/20 hover:bg-primary hover:text-white transition-all">View Details</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<aside class="xl:col-span-4 space-y-stack-lg">
+<div class="space-y-stack-md">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Recent Activity</h3>
+<div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-6 space-y-6 relative overflow-hidden">
+<div class="absolute left-[33px] top-6 bottom-6 w-px bg-border-low-contrast"></div>
+<div class="relative flex gap-4">
+<div class="w-4 h-4 rounded-full bg-status-approved border-4 border-surface-container-lowest z-10 mt-1"></div>
+<div class="flex-1">
+<p class="font-body-md text-body-md text-on-surface">RFQ #2024-012 Approved</p>
+<p class="text-secondary text-body-sm">By Procurement Lead Sarah J.</p>
+<p class="text-[11px] text-secondary-fixed-dim uppercase mt-1">2 hours ago</p>
+</div>
+</div>
+<div class="relative flex gap-4">
+<div class="w-4 h-4 rounded-full bg-status-info border-4 border-surface-container-lowest z-10 mt-1"></div>
+<div class="flex-1">
+<p class="font-body-md text-body-md text-on-surface">New Vendor Registered</p>
+<p class="text-secondary text-body-sm">BioPharma Supplies LLC submitted docs.</p>
+<p class="text-[11px] text-secondary-fixed-dim uppercase mt-1">5 hours ago</p>
+</div>
+</div>
+<div class="relative flex gap-4">
+<div class="w-4 h-4 rounded-full bg-status-pending border-4 border-surface-container-lowest z-10 mt-1"></div>
+<div class="flex-1">
+<p class="font-body-md text-body-md text-on-surface">Quotation Update</p>
+<p class="text-secondary text-body-sm">Global Networks revised pricing for RFQ-001.</p>
+<p class="text-[11px] text-secondary-fixed-dim uppercase mt-1">Yesterday</p>
+</div>
+</div>
+<div class="relative flex gap-4">
+<div class="w-4 h-4 rounded-full bg-status-rejected border-4 border-surface-container-lowest z-10 mt-1"></div>
+<div class="flex-1">
+<p class="font-body-md text-body-md text-on-surface">Order #PO-991 Cancelled</p>
+<p class="text-secondary text-body-sm">System flagged suspicious transaction ID.</p>
+<p class="text-[11px] text-secondary-fixed-dim uppercase mt-1">Oct 13, 2023</p>
+</div>
+</div>
+</div>
+</div>
+<div class="space-y-stack-md">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Quick Actions</h3>
+<div class="grid grid-cols-2 gap-3">
+<button class="flex flex-col items-center justify-center p-4 bg-surface-container-low rounded-xl border border-border-low-contrast hover:bg-primary-fixed transition-colors group">
+<span class="material-symbols-outlined text-primary mb-2 group-hover:scale-110 transition-transform">person_add</span>
+<span class="font-label-md text-label-md text-on-surface">Register Vendor</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 bg-surface-container-low rounded-xl border border-border-low-contrast hover:bg-primary-fixed transition-colors group">
+<span class="material-symbols-outlined text-primary mb-2 group-hover:scale-110 transition-transform">bar_chart_4_bars</span>
+<span class="font-label-md text-label-md text-on-surface">Market Trends</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 bg-surface-container-low rounded-xl border border-border-low-contrast hover:bg-primary-fixed transition-colors group">
+<span class="material-symbols-outlined text-primary mb-2 group-hover:scale-110 transition-transform">inventory_2</span>
+<span class="font-label-md text-label-md text-on-surface">Bulk Import</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 bg-surface-container-low rounded-xl border border-border-low-contrast hover:bg-primary-fixed transition-colors group">
+<span class="material-symbols-outlined text-primary mb-2 group-hover:scale-110 transition-transform">verified_user</span>
+<span class="font-label-md text-label-md text-on-surface">Compliance</span>
+</button>
+</div>
+</div>
+</aside>
+</div>
+</main>
+</div>
+<script>
+        // Simple micro-interaction for cards
+        document.querySelectorAll('.analytics-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.classList.add('shadow-md');
+            });
+            card.addEventListener('mouseleave', () => {
+                card.classList.remove('shadow-md');
+            });
+        });
+    </script>
+</body></html>
