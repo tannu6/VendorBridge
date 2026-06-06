@@ -1,0 +1,44 @@
+<html>
+<body style="font-family: Arial, sans-serif; color: #333;">
+<table width="100%" style="max-width: 600px; margin: 0 auto; border-collapse: collapse;">
+<tr>
+    <td style="padding: 20px; background-color: #f5f5f5; text-align: center;">
+        <h1 style="color: #2563eb; margin: 0;">VendorBridge</h1>
+    </td>
+</tr>
+<tr>
+    <td style="padding: 20px;">
+        <h2 style="color: #ef4444;">✗ Quotation Not Accepted</h2>
+        <p>Dear {{ vendor.company_name }},</p>
+        
+        <p>Thank you for submitting your quotation for RFQ {{ rfq.rfq_number }}. Unfortunately, your quotation was not selected for this purchase order.</p>
+        
+        <table style="width: 100%; background-color: #fef2f2; border: 2px solid #ef4444; border-radius: 4px; margin: 15px 0;">
+            <tr>
+                <td style="padding: 10px; font-weight: bold; color: #ef4444;">Quotation Number:</td>
+                <td style="padding: 10px;">{{ quotation.quotation_number }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; font-weight: bold; color: #ef4444;">RFQ:</td>
+                <td style="padding: 10px;">{{ rfq.rfq_number }} - {{ rfq.title|truncatewords:6 }}</td>
+            </tr>
+        </table>
+        
+        {% if rejection_reason %}
+        <p><strong>Feedback:</strong></p>
+        <p style="background-color: #f0f0f0; padding: 10px; border-radius: 4px;">{{ rejection_reason }}</p>
+        {% endif %}
+        
+        <p>We appreciate your participation in our procurement process. We hope to continue working with you for future opportunities.</p>
+        
+        <p>Best regards,<br>VendorBridge Team</p>
+    </td>
+</tr>
+<tr>
+    <td style="padding: 15px; background-color: #f5f5f5; text-align: center; color: #666; font-size: 12px;">
+        <p>© 2024 VendorBridge. All rights reserved.</p>
+    </td>
+</tr>
+</table>
+</body>
+</html>

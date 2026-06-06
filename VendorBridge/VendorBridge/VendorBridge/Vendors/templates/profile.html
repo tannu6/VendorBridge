@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+{% with active_page="profile" %}
+
+{% block title %}Company Profile – VendorBridge{% endblock %}
+{% block page_title %}Company Profile{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-in">
+    <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-primary-fixed flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary text-headline-sm" style="font-variation-settings: 'FILL' 1;">business</span>
+        </div>
+        <div>
+            <h2 class="font-headline-md text-headline-md text-on-surface">Company Profile</h2>
+            <p class="font-body-sm text-body-sm text-secondary mt-0.5">Manage your company information and documents</p>
+        </div>
+    </div>
+    <span class="status-badge status-{{ vendor.status }}">{{ vendor.get_status_display }}</span>
+</div>
+
+<!-- Read-Only Info Bar -->
+<div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-6 animate-in animate-in-delay-1">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <!-- Company Code -->
+        <div>
+            <p class="font-label-md text-label-md text-secondary uppercase mb-1">Company Code</p>
+            <div class="flex items-center gap-2">
+                <span class="font-data-tabular text-data-tabular text-on-surface bg-surface-container-low px-3 py-1.5 rounded-lg border border-border-low-contrast">{{ vendor.company_code }}</span>
+                <span class="font-body-sm text-body-sm text-secondary italic">Auto-generated, read-only</span>
+            </div>
+        </div>
+
+        <!-- Rating -->
+        <div>
+            <p class="font-label-md text-label-md text-secondary uppercase mb-1">Vendor Rating</p>
+            <div class="flex items-center gap-2">
+                <div class="flex items-center">
+                    {% with rating_int=vendor.rating|floatformat:0 %}
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= rating_int|add:0 %}
+                        <span class="material-symbols-outlined text-status-pending text-[22px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                        {% else %}
+                        <span class="material-symbols-outlined text-border-low-contrast text-[22px]">star</span>
+                        {% endif %}
+                    {% endfor %}
+                    {% endwith %}
+                </div>
+                <span class="font-data-tabular text-data-tabular text-on-surface">{{ vendor.rating }}/5.00</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Non-field Errors -->
+{% if form.non_field_errors %}
+<div class="bg-error-container border border-error/20 rounded-xl p-4 animate-in">
+    <div class="flex items-start gap-2">
+        <span class="material-symbols-outlined text-on-error-container text-[20px] mt-0.5">error</span>
+        <div>
+            {% for error in form.non_field_errors %}
+            <p class="font-body-md text-body-md text-on-error-container">{{ error }}</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Profile Form -->
+<form method="POST" action="{% url 'vendor_profile' %}" enctype="multipart/form-data" class="space-y-stack-lg">
+    {% csrf_token %}
+
+    <!-- Section 1: Company Information -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-6 space-y-6 animate-in animate-in-delay-2">
+        <div class="flex items-center gap-2 pb-3 border-b border-border-low-contrast">
+            <span class="material-symbols-outlined text-primary text-[20px]">apartment</span>
+            <h3 class="font-headline-sm text-headline-sm text-on-surface">Company Information</h3>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for field in form %}
+                {% if field.name == 'company_name' or field.name == 'company_size' or field.name == 'industry' or field.name == 'website' %}
+                <div>
+                    <label for="{{ field.id_for_label }}" class="block font-label-md text-label-md text-on-surface mb-2">
+                        {{ field.label }}
+                        {% if field.field.required %}<span class="text-error">*</span>{% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.help_text %}<p class="mt-1 font-body-sm text-body-sm text-secondary">{{ field.help_text }}</p>{% endif %}
+                    {% if field.errors %}
+                    <div class="mt-1">{% for error in field.errors %}<p class="font-body-sm text-body-sm text-error flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">error</span>{{ error }}</p>{% endfor %}</div>
+                    {% endif %}
+                </div>
+                {% elif field.name == 'description' %}
+                <div class="md:col-span-2">
+                    <label for="{{ field.id_for_label }}" class="block font-label-md text-label-md text-on-surface mb-2">
+                        {{ field.label }}
+                        {% if field.field.required %}<span class="text-error">*</span>{% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.help_text %}<p class="mt-1 font-body-sm text-body-sm text-secondary">{{ field.help_text }}</p>{% endif %}
+                    {% if field.errors %}
+                    <div class="mt-1">{% for error in field.errors %}<p class="font-body-sm text-body-sm text-error flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">error</span>{{ error }}</p>{% endfor %}</div>
+                    {% endif %}
+                </div>
+                {% elif field.name == 'logo' %}
+                <div class="md:col-span-2">
+                    <label for="{{ field.id_for_label }}" class="block font-label-md text-label-md text-on-surface mb-2">
+                        {{ field.label }}
+                    </label>
+                    {% if vendor.logo %}
+                    <div class="mb-3 flex items-center gap-3">
+                        <img src="{{ vendor.logo.url }}" alt="Company Logo" class="w-16 h-16 rounded-xl object-cover border border-border-low-contrast">
+                        <span class="font-body-sm text-body-sm text-secondary">Current logo</span>
+                    </div>
+                    {% endif %}
+                    <input type="file" name="{{ field.html_name }}" id="{{ field.id_for_label }}"
+                           class="form-input file:mr-4 file:py-1 file:px-4 file:rounded-lg file:border-0 file:font-label-md file:text-label-md file:bg-primary-fixed file:text-primary hover:file:bg-primary-fixed-dim file:cursor-pointer">
+                    {% if field.help_text %}<p class="mt-1 font-body-sm text-body-sm text-secondary">{{ field.help_text }}</p>{% endif %}
+                    {% if field.errors %}
+                    <div class="mt-1">{% for error in field.errors %}<p class="font-body-sm text-body-sm text-error flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">error</span>{{ error }}</p>{% endfor %}</div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Section 2: Contact Details -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-6 space-y-6 animate-in animate-in-delay-2">
+        <div class="flex items-center gap-2 pb-3 border-b border-border-low-contrast">
+            <span class="material-symbols-outlined text-primary text-[20px]">contact_phone</span>
+            <h3 class="font-headline-sm text-headline-sm text-on-surface">Contact Details</h3>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for field in form %}
+                {% if field.name == 'contact_person' or field.name == 'contact_email' or field.name == 'contact_phone' or field.name == 'alternate_phone' %}
+                <div>
+                    <label for="{{ field.id_for_label }}" class="block font-label-md text-label-md text-on-surface mb-2">
+                        {{ field.label }}
+                        {% if field.field.required %}<span class="text-error">*</span>{% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.help_text %}<p class="mt-1 font-body-sm text-body-sm text-secondary">{{ field.help_text }}</p>{% endif %}
+                    {% if field.errors %}
+                    <div class="mt-1">{% for error in field.errors %}<p class="font-body-sm text-body-sm text-error flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">error</span>{{ error }}</p>{% endfor %}</div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Section 3: Address -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-6 space-y-6 animate-in animate-in-delay-3">
+        <div class="flex items-center gap-2 pb-3 border-b border-border-low-contrast">
+            <span class="material-symbols-outlined text-primary text-[20px]">location_on</span>
+            <h3 class="font-headline-sm text-headline-sm text-on-surface">Address</h3>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for field in form %}
+                {% if field.name == 'address_line_1' or field.name == 'address_line_2' or field.name == 'city' or field.name == 'state' or field.name == 'country' or field.name == 'postal_code' %}
+                <div class="{% if field.name == 'address_line_1' or field.name == 'address_line_2' %}md:col-span-2{% endif %}">
+                    <label for="{{ field.id_for_label }}" class="block font-label-md text-label-md text-on-surface mb-2">
+                        {{ field.label }}
+                        {% if field.field.required %}<span class="text-error">*</span>{% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.help_text %}<p class="mt-1 font-body-sm text-body-sm text-secondary">{{ field.help_text }}</p>{% endif %}
+                    {% if field.errors %}
+                    <div class="mt-1">{% for error in field.errors %}<p class="font-body-sm text-body-sm text-error flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">error</span>{{ error }}</p>{% endfor %}</div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Section 4: Tax & Legal -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-6 space-y-6 animate-in animate-in-delay-3">
+        <div class="flex items-center gap-2 pb-3 border-b border-border-low-contrast">
+            <span class="material-symbols-outlined text-primary text-[20px]">gavel</span>
+            <h3 class="font-headline-sm text-headline-sm text-on-surface">Tax & Legal</h3>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for field in form %}
+                {% if field.name == 'gstin' or field.name == 'pan_number' or field.name == 'registration_number' %}
+                <div>
+                    <label for="{{ field.id_for_label }}" class="block font-label-md text-label-md text-on-surface mb-2">
+                        {{ field.label }}
+                        {% if field.field.required %}<span class="text-error">*</span>{% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.help_text %}<p class="mt-1 font-body-sm text-body-sm text-secondary">{{ field.help_text }}</p>{% endif %}
+                    {% if field.errors %}
+                    <div class="mt-1">{% for error in field.errors %}<p class="font-body-sm text-body-sm text-error flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">error</span>{{ error }}</p>{% endfor %}</div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Section 5: Banking Details -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-6 space-y-6 animate-in animate-in-delay-4">
+        <div class="flex items-center gap-2 pb-3 border-b border-border-low-contrast">
+            <span class="material-symbols-outlined text-primary text-[20px]">account_balance</span>
+            <h3 class="font-headline-sm text-headline-sm text-on-surface">Banking Details</h3>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for field in form %}
+                {% if field.name == 'bank_name' or field.name == 'bank_account_number' or field.name == 'bank_ifsc_code' or field.name == 'bank_branch' %}
+                <div>
+                    <label for="{{ field.id_for_label }}" class="block font-label-md text-label-md text-on-surface mb-2">
+                        {{ field.label }}
+                        {% if field.field.required %}<span class="text-error">*</span>{% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.help_text %}<p class="mt-1 font-body-sm text-body-sm text-secondary">{{ field.help_text }}</p>{% endif %}
+                    {% if field.errors %}
+                    <div class="mt-1">{% for error in field.errors %}<p class="font-body-sm text-body-sm text-error flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">error</span>{{ error }}</p>{% endfor %}</div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Save Button -->
+    <div class="flex items-center justify-end gap-3 animate-in animate-in-delay-4">
+        <button type="submit"
+                class="bg-primary text-on-primary px-8 py-2.5 rounded-xl font-label-md text-label-md inline-flex items-center gap-2 shadow-sm hover:opacity-90 transition-opacity active:scale-95">
+            <span class="material-symbols-outlined text-[20px]">save</span>
+            Save Changes
+        </button>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Apply form-input class to all Django-generated form widgets
+    document.addEventListener('DOMContentLoaded', function () {
+        const formFields = document.querySelectorAll('form input:not([type="file"]):not([type="checkbox"]):not([type="hidden"]), form select, form textarea');
+        formFields.forEach(function (el) {
+            if (!el.classList.contains('form-input')) {
+                el.classList.add('form-input');
+            }
+        });
+    });
+</script>
+{% endblock %}
+
+{% endwith %}

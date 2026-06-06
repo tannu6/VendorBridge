@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Register — VendorBridge</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary-container": "#6965db",
+                        "primary": "#504bc0",
+                        "primary-fixed": "#e2dfff",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#fefaff",
+                        "on-primary-fixed-variant": "#3a33ab",
+                        "surface": "#f8f9ff",
+                        "surface-subtle": "#F4F7FF",
+                        "surface-container": "#eaeef9",
+                        "surface-container-low": "#f0f3ff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#e4e8f3",
+                        "surface-container-highest": "#dee2ed",
+                        "surface-dim": "#d6dae5",
+                        "surface-variant": "#dee2ed",
+                        "surface-tint": "#534ec3",
+                        "on-surface": "#171c23",
+                        "on-surface-variant": "#464553",
+                        "secondary": "#5f5e5e",
+                        "secondary-container": "#e2dfde",
+                        "secondary-fixed": "#e5e2e1",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-container": "#636262",
+                        "on-secondary-fixed": "#1b1b1c",
+                        "tertiary": "#864e00",
+                        "tertiary-container": "#a86400",
+                        "on-tertiary": "#ffffff",
+                        "outline": "#777585",
+                        "outline-variant": "#c7c4d5",
+                        "border-low-contrast": "#E4E8F3",
+                        "background": "#f8f9ff",
+                        "on-background": "#171c23",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#2c3139",
+                        "inverse-on-surface": "#edf1fc",
+                        "inverse-primary": "#c3c0ff",
+                        "status-approved": "#10B981",
+                        "status-pending": "#F59E0B",
+                        "status-rejected": "#EF4444",
+                        "status-info": "#3B82F6",
+                    },
+                    borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
+                    spacing: { gutter: "16px", "stack-sm": "8px", "stack-md": "16px", base: "4px", "container-margin": "24px", "stack-lg": "32px" },
+                    fontFamily: {
+                        "headline-md": ["Inter"], "body-md": ["Inter"], "display-lg": ["Inter"],
+                        "body-sm": ["Inter"], "label-md": ["Inter"], "data-tabular": ["Inter"],
+                        "headline-sm": ["Inter"], "body-lg": ["Inter"],
+                    },
+                    fontSize: {
+                        "headline-md": ["24px", { lineHeight: "32px", letterSpacing: "-0.01em", fontWeight: "600" }],
+                        "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+                        "display-lg": ["36px", { lineHeight: "44px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "body-sm": ["13px", { lineHeight: "18px", fontWeight: "400" }],
+                        "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600" }],
+                        "data-tabular": ["14px", { lineHeight: "20px", fontWeight: "500" }],
+                        "headline-sm": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+                        "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #dee2ed; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #c7c4d5; }
+        .form-input {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            border: 1px solid #E4E8F3;
+            border-radius: 0.5rem;
+            font-size: 14px;
+            line-height: 20px;
+            color: #171c23;
+            background: #ffffff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+        }
+        .form-input:focus {
+            border-color: #504bc0;
+            box-shadow: 0 0 0 3px rgba(80, 75, 192, 0.12);
+        }
+        .form-input::placeholder { color: #777585; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in { animation: fadeInUp 0.4s ease-out forwards; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md">
+
+<div class="min-h-screen flex">
+    <!-- Left Branding Panel -->
+    <div class="hidden lg:flex lg:w-5/12 xl:w-[480px] bg-gradient-to-br from-primary to-primary-container relative overflow-hidden flex-col justify-between p-12">
+        <!-- Decorative circles -->
+        <div class="absolute -top-20 -left-20 w-72 h-72 bg-white/5 rounded-full"></div>
+        <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-white/5 rounded-full"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/[0.03] rounded-full"></div>
+
+        <div class="relative z-10">
+            <div class="flex items-center gap-3 mb-16">
+                <div class="w-12 h-12 bg-white/15 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                    <span class="material-symbols-outlined text-white text-headline-md" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+                </div>
+                <div>
+                    <h1 class="text-white font-black text-2xl leading-tight">VendorBridge</h1>
+                    <p class="text-white/60 font-label-md text-label-md uppercase tracking-widest">Vendor Portal</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="relative z-10 space-y-6">
+            <h2 class="text-white font-display-lg text-display-lg leading-tight">Join a smarter<br>procurement<br>ecosystem.</h2>
+            <p class="text-white/70 font-body-lg text-body-lg max-w-sm">Register your company and gain access to RFQs, submit quotations, manage orders, and grow your business — all in one place.</p>
+        </div>
+
+        <div class="relative z-10 flex items-center gap-4 pt-8">
+            <div class="flex -space-x-2">
+                <div class="w-8 h-8 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center text-white text-[10px] font-bold">TK</div>
+                <div class="w-8 h-8 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center text-white text-[10px] font-bold">SL</div>
+                <div class="w-8 h-8 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center text-white text-[10px] font-bold">MR</div>
+            </div>
+            <p class="text-white/60 text-body-sm font-body-sm">Trusted by 500+ vendors worldwide</p>
+        </div>
+    </div>
+
+    <!-- Right Form Panel -->
+    <div class="flex-1 flex items-start justify-center overflow-y-auto py-10 px-6 lg:px-16">
+        <div class="w-full max-w-xl animate-in">
+            <!-- Mobile branding -->
+            <div class="lg:hidden flex items-center gap-3 mb-8">
+                <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-on-primary">
+                    <span class="material-symbols-outlined text-headline-sm" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+                </div>
+                <div>
+                    <h1 class="font-headline-sm text-headline-sm font-black text-primary leading-tight">VendorBridge</h1>
+                    <p class="font-label-md text-label-md text-secondary uppercase tracking-widest">Vendor Portal</p>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h2 class="font-headline-md text-headline-md text-on-surface">Create your account</h2>
+                <p class="font-body-md text-body-md text-secondary mt-1">Fill in your details to register as a vendor</p>
+            </div>
+
+            <!-- Django Messages -->
+            {% if messages %}
+            <div class="mb-6 space-y-2">
+                {% for message in messages %}
+                <div class="p-3 rounded-xl flex items-center gap-2 text-body-sm animate-in
+                    {% if message.tags == 'success' %}bg-status-approved/10 text-status-approved border border-status-approved/20
+                    {% elif message.tags == 'error' %}bg-error-container text-on-error-container border border-error/20
+                    {% elif message.tags == 'warning' %}bg-status-pending/10 text-status-pending border border-status-pending/20
+                    {% else %}bg-status-info/10 text-status-info border border-status-info/20{% endif %}">
+                    <span class="material-symbols-outlined text-[18px]">
+                        {% if message.tags == 'success' %}check_circle
+                        {% elif message.tags == 'error' %}error
+                        {% elif message.tags == 'warning' %}warning
+                        {% else %}info{% endif %}
+                    </span>
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="POST" action="{% url 'vendor_register' %}" novalidate>
+                {% csrf_token %}
+
+                <!-- Section 1: Account Information -->
+                <div class="mb-8">
+                    <div class="flex items-center gap-2 mb-5">
+                        <div class="w-7 h-7 bg-primary-fixed rounded-lg flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary text-[18px]">person</span>
+                        </div>
+                        <h3 class="font-headline-sm text-headline-sm text-on-surface text-[16px]">Account Information</h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">Username</label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                            <div class="mt-1 text-error text-body-sm flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[14px]">error</span>
+                                {{ form.username.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">First Name</label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}
+                                <div class="mt-1 text-error text-body-sm flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">error</span>
+                                    {{ form.first_name.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">Last Name</label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}
+                                <div class="mt-1 text-error text-body-sm flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">error</span>
+                                    {{ form.last_name.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">Email Address</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                            <div class="mt-1 text-error text-body-sm flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[14px]">error</span>
+                                {{ form.email.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">Password</label>
+                                {{ form.password1 }}
+                                {% if form.password1.errors %}
+                                <div class="mt-1 text-error text-body-sm flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">error</span>
+                                    {{ form.password1.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">Confirm Password</label>
+                                {{ form.password2 }}
+                                {% if form.password2.errors %}
+                                <div class="mt-1 text-error text-body-sm flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">error</span>
+                                    {{ form.password2.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Divider -->
+                <div class="border-t border-border-low-contrast mb-8"></div>
+
+                <!-- Section 2: Company Information -->
+                <div class="mb-8">
+                    <div class="flex items-center gap-2 mb-5">
+                        <div class="w-7 h-7 bg-primary-fixed rounded-lg flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary text-[18px]">business</span>
+                        </div>
+                        <h3 class="font-headline-sm text-headline-sm text-on-surface text-[16px]">Company Information</h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">Company Name</label>
+                            {{ form.company_name }}
+                            {% if form.company_name.errors %}
+                            <div class="mt-1 text-error text-body-sm flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[14px]">error</span>
+                                {{ form.company_name.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">Contact Person</label>
+                                {{ form.contact_person }}
+                                {% if form.contact_person.errors %}
+                                <div class="mt-1 text-error text-body-sm flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">error</span>
+                                    {{ form.contact_person.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">Phone Number</label>
+                                {{ form.contact_phone }}
+                                {% if form.contact_phone.errors %}
+                                <div class="mt-1 text-error text-body-sm flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">error</span>
+                                    {{ form.contact_phone.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">Industry <span class="text-outline font-normal">(optional)</span></label>
+                            {{ form.industry }}
+                            {% if form.industry.errors %}
+                            <div class="mt-1 text-error text-body-sm flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[14px]">error</span>
+                                {{ form.industry.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Divider -->
+                <div class="border-t border-border-low-contrast mb-8"></div>
+
+                <!-- Section 3: Address -->
+                <div class="mb-8">
+                    <div class="flex items-center gap-2 mb-5">
+                        <div class="w-7 h-7 bg-primary-fixed rounded-lg flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary text-[18px]">location_on</span>
+                        </div>
+                        <h3 class="font-headline-sm text-headline-sm text-on-surface text-[16px]">Address</h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">Address Line 1</label>
+                            {{ form.address_line_1 }}
+                            {% if form.address_line_1.errors %}
+                            <div class="mt-1 text-error text-body-sm flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[14px]">error</span>
+                                {{ form.address_line_1.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">City</label>
+                                {{ form.city }}
+                                {% if form.city.errors %}
+                                <div class="mt-1 text-error text-body-sm flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">error</span>
+                                    {{ form.city.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">State</label>
+                                {{ form.state }}
+                                {% if form.state.errors %}
+                                <div class="mt-1 text-error text-body-sm flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">error</span>
+                                    {{ form.state.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">Country</label>
+                                {{ form.country }}
+                                {% if form.country.errors %}
+                                <div class="mt-1 text-error text-body-sm flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">error</span>
+                                    {{ form.country.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">Postal Code</label>
+                                {{ form.postal_code }}
+                                {% if form.postal_code.errors %}
+                                <div class="mt-1 text-error text-body-sm flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">error</span>
+                                    {{ form.postal_code.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="w-full bg-primary text-on-primary px-6 py-3 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 shadow-sm hover:opacity-90 transition-opacity active:scale-[0.98]">
+                    <span class="material-symbols-outlined text-[20px]">how_to_reg</span>
+                    Create Account
+                </button>
+            </form>
+
+            <p class="text-center text-secondary font-body-sm text-body-sm mt-6 pb-8">
+                Already have an account?
+                <a href="{% url 'vendor_login' %}" class="text-primary font-semibold hover:underline">Sign in</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

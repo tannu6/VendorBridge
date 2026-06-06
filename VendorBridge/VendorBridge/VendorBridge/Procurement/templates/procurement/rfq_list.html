@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}RFQs — Procurement — VendorBridge{% endblock %}
+{% block page_title %}Request for Quotations{% endblock %}
+
+{% block content %}
+<div class="space-y-stack-lg">
+    <div class="flex justify-between items-center">
+        <h2 class="font-headline-md text-headline-md">RFQs</h2>
+        <a href="{% url 'rfq_create' %}" class="bg-primary text-on-primary px-6 py-2.5 rounded-xl font-label-md flex items-center gap-2">
+            <span class="material-symbols-outlined">add</span>
+            New RFQ
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <form method="get" class="flex gap-4 flex-wrap">
+            <input type="text" name="search" placeholder="Search RFQs..." value="{{ request.GET.search }}" class="px-3 py-2 rounded border border-border-low-contrast flex-1 min-w-48">
+            <select name="status" class="px-3 py-2 rounded border border-border-low-contrast">
+                <option value="">All Statuses</option>
+                <option value="DRAFT" {% if request.GET.status == 'DRAFT' %}selected{% endif %}>Draft</option>
+                <option value="PUBLISHED" {% if request.GET.status == 'PUBLISHED' %}selected{% endif %}>Published</option>
+                <option value="CLOSED" {% if request.GET.status == 'CLOSED' %}selected{% endif %}>Closed</option>
+            </select>
+            <button type="submit" class="bg-primary text-on-primary px-6 py-2.5 rounded-xl font-label-md">Filter</button>
+        </form>
+    </div>
+
+    <!-- RFQs Table -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl overflow-hidden">
+        <table class="w-full">
+            <thead class="bg-surface-container border-b border-border-low-contrast">
+                <tr>
+                    <th class="px-5 py-3 text-left font-label-md text-on-surface">RFQ Number</th>
+                    <th class="px-5 py-3 text-left font-label-md text-on-surface">Title</th>
+                    <th class="px-5 py-3 text-left font-label-md text-on-surface">Status</th>
+                    <th class="px-5 py-3 text-left font-label-md text-on-surface">Items</th>
+                    <th class="px-5 py-3 text-left font-label-md text-on-surface">Deadline</th>
+                    <th class="px-5 py-3 text-center font-label-md text-on-surface">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rfq in rfqs %}
+                <tr class="border-b border-border-low-contrast hover:bg-surface-container transition">
+                    <td class="px-5 py-3 font-label-md text-on-surface">{{ rfq.rfq_number }}</td>
+                    <td class="px-5 py-3 text-body-sm">{{ rfq.title|truncatewords:8 }}</td>
+                    <td class="px-5 py-3">
+                        <span class="status-badge status-{{ rfq.status }}">{{ rfq.get_status_display }}</span>
+                    </td>
+                    <td class="px-5 py-3 text-body-sm">{{ rfq.items.count }} items</td>
+                    <td class="px-5 py-3 text-body-sm">{{ rfq.submission_deadline|date:"M d, Y" }}</td>
+                    <td class="px-5 py-3 flex justify-center gap-2">
+                        <a href="{% url 'rfq_edit' rfq.id %}" class="text-primary hover:underline text-label-md">Edit</a>
+                        {% if rfq.status == 'DRAFT' %}
+                        <a href="{% url 'rfq_publish' rfq.id %}" class="text-status-approved hover:underline text-label-md">Publish</a>
+                        {% elif rfq.status == 'PUBLISHED' %}
+                        <a href="{% url 'rfq_close' rfq.id %}" class="text-status-rejected hover:underline text-label-md">Close</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="px-5 py-8 text-center text-secondary">No RFQs found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

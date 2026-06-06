@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Vendor Profile — Procurement — VendorBridge{% endblock %}
+{% block page_title %}Vendor Profile{% endblock %}
+
+{% block content %}
+<div class="space-y-stack-lg">
+    <div class="flex justify-between items-center">
+        <div>
+            <h2 class="font-headline-md">{{ vendor.company_name }}</h2>
+            <p class="text-secondary text-body-sm">{{ vendor.company_type }}</p>
+        </div>
+        <span class="status-badge status-{{ vendor.status }}">{{ vendor.get_status_display }}</span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+        <!-- Main Info -->
+        <div class="lg:col-span-2 space-y-gutter">
+            <!-- Company Details -->
+            <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+                <h3 class="font-headline-sm mb-4">Company Information</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-secondary text-label-md">Email</p>
+                        <p class="font-label-md text-on-surface">{{ vendor.contact_email }}</p>
+                    </div>
+                    <div>
+                        <p class="text-secondary text-label-md">Phone</p>
+                        <p class="font-label-md text-on-surface">{{ vendor.contact_phone }}</p>
+                    </div>
+                    <div>
+                        <p class="text-secondary text-label-md">Address</p>
+                        <p class="font-label-md text-on-surface">{{ vendor.address|default:"Not provided" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-secondary text-label-md">City</p>
+                        <p class="font-label-md text-on-surface">{{ vendor.city|default:"Not provided" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Purchase History -->
+            <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+                <h3 class="font-headline-sm mb-4">Purchase Orders</h3>
+                {% if vendor.purchase_orders.all %}
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-surface-container border-b border-border-low-contrast">
+                            <tr>
+                                <th class="px-3 py-2 text-left text-label-md">PO Number</th>
+                                <th class="px-3 py-2 text-right text-label-md">Amount</th>
+                                <th class="px-3 py-2 text-left text-label-md">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for po in vendor.purchase_orders.all|slice:":5" %}
+                            <tr class="border-b border-border-low-contrast">
+                                <td class="px-3 py-2">{{ po.po_number }}</td>
+                                <td class="px-3 py-2 text-right font-label-md">₹{{ po.grand_total|floatformat:2 }}</td>
+                                <td class="px-3 py-2">
+                                    <span class="status-badge status-{{ po.status }}">{{ po.get_status_display }}</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <a href="{% url 'proc_po_list' %}?vendor={{ vendor.id }}" class="text-primary hover:underline text-label-md mt-3 block">View all POs →</a>
+                {% else %}
+                <p class="text-secondary text-body-sm">No purchase orders yet</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="space-y-gutter">
+            <!-- Rating -->
+            <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+                <h3 class="font-headline-sm mb-4">Performance</h3>
+                <div class="space-y-3">
+                    <div>
+                        <p class="text-secondary text-label-md">Rating</p>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="font-display-sm">{{ vendor.rating|default:"N/A" }}/5</span>
+                            <span class="text-xl">{{ vendor.rating|floatformat:1 }}</span>
+                        </div>
+                    </div>
+                    {% if vendor.total_orders %}
+                    <div>
+                        <p class="text-secondary text-label-md">Total Orders</p>
+                        <p class="font-label-md text-on-surface">{{ vendor.total_orders }}</p>
+                    </div>
+                    {% endif %}
+                    {% if vendor.total_spent %}
+                    <div>
+                        <p class="text-secondary text-label-md">Total Spent</p>
+                        <p class="font-label-md text-on-surface">₹{{ vendor.total_spent|floatformat:2 }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Status Info -->
+            <div class="bg-status-approved/10 border border-status-approved rounded-xl p-4">
+                <p class="text-body-sm text-on-surface">
+                    <strong>Status:</strong> This vendor is currently <strong>{{ vendor.get_status_display|lower }}</strong>.
+                </p>
+            </div>
+
+            <a href="{% url 'proc_vendor_list' %}" class="block text-center text-primary hover:underline font-label-md py-2">← Back to Vendors</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

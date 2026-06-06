@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% with active_page="notifications" %}
+
+{% block title %}Notifications — VendorBridge{% endblock %}
+{% block page_title %}Notifications{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<section class="flex items-center justify-between animate-in">
+    <div>
+        <h2 class="font-headline-md text-headline-md text-on-surface">Notifications</h2>
+        <p class="font-body-md text-body-md text-secondary mt-1">Stay updated with your latest activity</p>
+    </div>
+    <a href="{% url 'mark_all_read' %}" class="bg-surface-container-lowest border border-border-low-contrast text-on-surface px-4 py-2.5 rounded-xl font-label-md text-label-md flex items-center gap-2 hover:bg-surface-container-low transition-colors">
+        <span class="material-symbols-outlined text-[18px]">done_all</span>
+        Mark All Read
+    </a>
+</section>
+
+<!-- Notifications List -->
+{% if notifications %}
+<div class="space-y-3 animate-in">
+    {% for notif in notifications %}
+    <a href="{% url 'mark_notification_read' notif.id %}" class="block bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5 hover:border-primary-container transition-all group {% if not notif.is_read %}border-l-4 border-l-primary{% endif %}">
+        <div class="flex items-start gap-4">
+            <!-- Icon based on notification type -->
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0
+                {% if notif.notification_type == 'rfq' %}bg-status-info/10 text-status-info
+                {% elif notif.notification_type == 'quotation' %}bg-primary-fixed text-primary
+                {% elif notif.notification_type == 'order' %}bg-status-approved/10 text-status-approved
+                {% elif notif.notification_type == 'invoice' %}bg-status-pending/10 text-status-pending
+                {% elif notif.notification_type == 'system' %}bg-surface-container-high text-secondary
+                {% else %}bg-surface-container-high text-secondary{% endif %}">
+                <span class="material-symbols-outlined">
+                    {% if notif.notification_type == 'rfq' %}request_quote
+                    {% elif notif.notification_type == 'quotation' %}description
+                    {% elif notif.notification_type == 'order' %}shopping_cart
+                    {% elif notif.notification_type == 'invoice' %}receipt_long
+                    {% elif notif.notification_type == 'system' %}settings
+                    {% else %}notifications{% endif %}
+                </span>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1 min-w-0">
+                <div class="flex items-start justify-between gap-4">
+                    <div class="min-w-0">
+                        <h4 class="font-data-tabular text-data-tabular text-on-surface group-hover:text-primary transition-colors {% if not notif.is_read %}font-bold{% endif %}">
+                            {{ notif.title }}
+                        </h4>
+                        <p class="font-body-sm text-body-sm text-secondary mt-1 line-clamp-2">{{ notif.message }}</p>
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        {% if not notif.is_read %}
+                        <span class="w-2 h-2 bg-primary rounded-full"></span>
+                        {% endif %}
+                        <span class="font-body-sm text-body-sm text-outline whitespace-nowrap">{{ notif.created_at|timesince }} ago</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if notifications.has_other_pages %}
+<nav class="flex items-center justify-center gap-2 pt-4 animate-in">
+    {% if notifications.has_previous %}
+    <a href="?page={{ notifications.previous_page_number }}" class="bg-surface-container-lowest border border-border-low-contrast text-on-surface px-3 py-2 rounded-xl font-label-md text-label-md hover:bg-surface-container-low transition-colors flex items-center gap-1">
+        <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+        Previous
+    </a>
+    {% endif %}
+
+    <div class="flex items-center gap-1">
+        {% for page_num in notifications.paginator.page_range %}
+            {% if notifications.number == page_num %}
+            <span class="bg-primary text-on-primary w-9 h-9 rounded-xl font-label-md text-label-md flex items-center justify-center">{{ page_num }}</span>
+            {% elif page_num > notifications.number|add:'-3' and page_num < notifications.number|add:'3' %}
+            <a href="?page={{ page_num }}" class="bg-surface-container-lowest border border-border-low-contrast text-on-surface w-9 h-9 rounded-xl font-label-md text-label-md flex items-center justify-center hover:bg-surface-container-low transition-colors">{{ page_num }}</a>
+            {% elif page_num == notifications.number|add:'-3' or page_num == notifications.number|add:'3' %}
+            <span class="text-secondary px-1">…</span>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    {% if notifications.has_next %}
+    <a href="?page={{ notifications.next_page_number }}" class="bg-surface-container-lowest border border-border-low-contrast text-on-surface px-3 py-2 rounded-xl font-label-md text-label-md hover:bg-surface-container-low transition-colors flex items-center gap-1">
+        Next
+        <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+    </a>
+    {% endif %}
+</nav>
+{% endif %}
+
+{% else %}
+<!-- Empty State -->
+<div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-16 text-center animate-in">
+    <div class="w-20 h-20 bg-surface-container-low rounded-full flex items-center justify-center mx-auto mb-5">
+        <span class="material-symbols-outlined text-outline text-[40px]">notifications_off</span>
+    </div>
+    <h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">No notifications yet</h3>
+    <p class="font-body-md text-body-md text-secondary max-w-md mx-auto">You're all caught up! Notifications about RFQs, quotations, orders, and invoices will appear here.</p>
+</div>
+{% endif %}
+{% endblock %}
+
+{% endwith %}

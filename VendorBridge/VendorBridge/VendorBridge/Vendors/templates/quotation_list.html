@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% with active_page="quotations" %}
+
+{% block title %}My Quotations — VendorBridge{% endblock %}
+{% block page_title %}My Quotations{% endblock %}
+
+{% block content %}
+<!-- Status Filter Tabs -->
+<section class="animate-in">
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-2 flex flex-wrap gap-1">
+        <a href="{% url 'quotation_list' %}"
+           class="px-4 py-2 rounded-lg font-label-md text-label-md transition-all {% if not current_status %}bg-primary text-on-primary{% else %}text-on-surface-variant hover:bg-surface-container-low{% endif %}">
+            All
+        </a>
+        <a href="?status=draft"
+           class="px-4 py-2 rounded-lg font-label-md text-label-md transition-all {% if current_status == 'draft' %}bg-primary text-on-primary{% else %}text-on-surface-variant hover:bg-surface-container-low{% endif %}">
+            Draft
+        </a>
+        <a href="?status=submitted"
+           class="px-4 py-2 rounded-lg font-label-md text-label-md transition-all {% if current_status == 'submitted' %}bg-primary text-on-primary{% else %}text-on-surface-variant hover:bg-surface-container-low{% endif %}">
+            Submitted
+        </a>
+        <a href="?status=under_review"
+           class="px-4 py-2 rounded-lg font-label-md text-label-md transition-all {% if current_status == 'under_review' %}bg-primary text-on-primary{% else %}text-on-surface-variant hover:bg-surface-container-low{% endif %}">
+            Under Review
+        </a>
+        <a href="?status=shortlisted"
+           class="px-4 py-2 rounded-lg font-label-md text-label-md transition-all {% if current_status == 'shortlisted' %}bg-primary text-on-primary{% else %}text-on-surface-variant hover:bg-surface-container-low{% endif %}">
+            Shortlisted
+        </a>
+        <a href="?status=accepted"
+           class="px-4 py-2 rounded-lg font-label-md text-label-md transition-all {% if current_status == 'accepted' %}bg-primary text-on-primary{% else %}text-on-surface-variant hover:bg-surface-container-low{% endif %}">
+            Accepted
+        </a>
+        <a href="?status=rejected"
+           class="px-4 py-2 rounded-lg font-label-md text-label-md transition-all {% if current_status == 'rejected' %}bg-primary text-on-primary{% else %}text-on-surface-variant hover:bg-surface-container-low{% endif %}">
+            Rejected
+        </a>
+    </div>
+</section>
+
+<!-- Quotations Table -->
+{% if quotations %}
+<section class="bg-surface-container-lowest border border-border-low-contrast rounded-xl overflow-hidden shadow-sm animate-in" style="animation-delay: 50ms;">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead class="bg-surface-subtle border-b border-border-low-contrast">
+                <tr>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Quotation #</th>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">RFQ</th>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Grand Total</th>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Delivery Days</th>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Status</th>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Submitted Date</th>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-border-low-contrast">
+                {% for q in quotations %}
+                <tr class="hover:bg-primary/5 transition-colors">
+                    <td class="px-6 py-4 font-data-tabular text-data-tabular font-semibold text-primary">{{ q.quotation_number }}</td>
+                    <td class="px-6 py-4">
+                        <div>
+                            <p class="font-data-tabular text-data-tabular">{{ q.rfq.rfq_number }}</p>
+                            <p class="font-body-sm text-body-sm text-secondary truncate max-w-[200px]">{{ q.rfq.title }}</p>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 font-data-tabular text-data-tabular">{{ q.grand_total }}</td>
+                    <td class="px-6 py-4 font-data-tabular text-data-tabular">{{ q.delivery_days|default:"—" }}</td>
+                    <td class="px-6 py-4">
+                        <span class="status-badge status-{{ q.status }}">{{ q.get_status_display }}</span>
+                    </td>
+                    <td class="px-6 py-4 font-body-sm text-body-sm text-secondary">{{ q.submitted_at|date:"M d, Y"|default:"—" }}</td>
+                    <td class="px-6 py-4 text-right">
+                        <a href="{% url 'quotation_detail' q.id %}"
+                           class="text-primary font-label-md text-label-md px-3 py-1.5 rounded-lg border border-primary/20 hover:bg-primary hover:text-on-primary transition-all inline-flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[16px]">visibility</span>
+                            View
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- Pagination -->
+{% if quotations.has_other_pages %}
+<nav class="flex items-center justify-center gap-2 pt-4 animate-in">
+    <div class="flex items-center gap-1 bg-surface-container-lowest border border-border-low-contrast rounded-xl p-1.5">
+        {% if quotations.has_previous %}
+        <a href="?page={{ quotations.previous_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}"
+           class="flex items-center gap-1 px-3 py-2 rounded-lg text-primary hover:bg-primary-fixed transition-colors font-label-md text-label-md">
+            <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+            Previous
+        </a>
+        {% endif %}
+
+        {% for page_num in quotations.paginator.page_range %}
+            {% if quotations.number == page_num %}
+            <span class="px-3 py-2 rounded-lg bg-primary text-on-primary font-label-md text-label-md min-w-[36px] text-center">{{ page_num }}</span>
+            {% elif page_num > quotations.number|add:'-3' and page_num < quotations.number|add:'3' %}
+            <a href="?page={{ page_num }}{% if current_status %}&status={{ current_status }}{% endif %}"
+               class="px-3 py-2 rounded-lg text-on-surface hover:bg-surface-container-low transition-colors font-label-md text-label-md min-w-[36px] text-center">{{ page_num }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if quotations.has_next %}
+        <a href="?page={{ quotations.next_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}"
+           class="flex items-center gap-1 px-3 py-2 rounded-lg text-primary hover:bg-primary-fixed transition-colors font-label-md text-label-md">
+            Next
+            <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+        </a>
+        {% endif %}
+    </div>
+</nav>
+{% endif %}
+
+{% else %}
+<!-- Empty State -->
+<section class="animate-in flex flex-col items-center justify-center py-20">
+    <div class="w-20 h-20 rounded-full bg-surface-container-low flex items-center justify-center mb-6">
+        <span class="material-symbols-outlined text-[40px] text-outline">description</span>
+    </div>
+    <h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">No Quotations Found</h3>
+    <p class="font-body-md text-body-md text-secondary text-center max-w-md mb-6">
+        {% if current_status %}
+        No quotations with status "{{ current_status }}" found. Try selecting a different status filter.
+        {% else %}
+        You haven't submitted any quotations yet. Browse open RFQs to get started.
+        {% endif %}
+    </p>
+    <a href="{% url 'rfq_list' %}"
+       class="bg-primary text-on-primary px-6 py-2.5 rounded-xl font-label-md text-label-md flex items-center gap-2 shadow-sm hover:opacity-90 transition-opacity">
+        <span class="material-symbols-outlined text-[18px]">request_quote</span>
+        Browse RFQs
+    </a>
+</section>
+{% endif %}
+{% endblock %}
+
+{% endwith %}

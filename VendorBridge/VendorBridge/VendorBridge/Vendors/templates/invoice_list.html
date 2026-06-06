@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% with active_page="invoices" %}
+
+{% block title %}My Invoices – VendorBridge{% endblock %}
+{% block page_title %}My Invoices{% endblock %}
+
+{% block content %}
+<!-- Status Filter Tabs -->
+<div class="animate-in">
+    <div class="flex items-center gap-2 flex-wrap">
+        <a href="{% url 'invoice_list' %}"
+           class="px-4 py-2 rounded-xl font-label-md text-label-md transition-colors
+                  {% if not current_status %}bg-primary text-on-primary{% else %}bg-surface-container-lowest border border-border-low-contrast text-on-surface-variant hover:bg-surface-container-low{% endif %}">
+            All
+        </a>
+        {% for value, label in status_choices %}
+        <a href="{% url 'invoice_list' %}?status={{ value }}"
+           class="px-4 py-2 rounded-xl font-label-md text-label-md transition-colors
+                  {% if current_status == value %}bg-primary text-on-primary{% else %}bg-surface-container-lowest border border-border-low-contrast text-on-surface-variant hover:bg-surface-container-low{% endif %}">
+            {{ label }}
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Invoices Table -->
+{% if invoices %}
+<div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl overflow-hidden shadow-sm animate-in animate-in-delay-1">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead class="bg-surface-subtle border-b border-border-low-contrast">
+                <tr>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Invoice #</th>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">PO Number</th>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase text-right">Total Amount</th>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase text-right">Amount Paid</th>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase text-right">Balance Due</th>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Status</th>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Due Date</th>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Created</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-border-low-contrast">
+                {% for invoice in invoices %}
+                <tr class="hover:bg-primary/5 transition-colors">
+                    <td class="px-6 py-4 font-data-tabular text-data-tabular text-on-surface">{{ invoice.invoice_number }}</td>
+                    <td class="px-6 py-4 font-data-tabular text-data-tabular">
+                        <a href="{% url 'order_detail' invoice.purchase_order.id %}" class="text-primary hover:underline">
+                            {{ invoice.purchase_order.po_number }}
+                        </a>
+                    </td>
+                    <td class="px-6 py-4 font-data-tabular text-data-tabular text-right">₹{{ invoice.total_amount|floatformat:2 }}</td>
+                    <td class="px-6 py-4 font-data-tabular text-data-tabular text-right text-status-approved">₹{{ invoice.amount_paid|floatformat:2 }}</td>
+                    <td class="px-6 py-4 font-data-tabular text-data-tabular text-right">
+                        <span class="{% if invoice.balance_due > 0 %}text-error font-semibold{% else %}text-status-approved{% endif %}">
+                            ₹{{ invoice.balance_due|floatformat:2 }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-2">
+                            <span class="status-badge status-{{ invoice.status }}">{{ invoice.get_status_display }}</span>
+                            {% if invoice.is_overdue %}
+                            <span class="inline-flex items-center gap-1 text-error font-label-md text-[11px]">
+                                <span class="material-symbols-outlined text-[16px]">warning</span>
+                                Overdue
+                            </span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 font-body-sm text-body-sm {% if invoice.is_overdue %}text-error font-semibold{% else %}text-secondary{% endif %}">
+                        {{ invoice.due_date|date:"M d, Y" }}
+                    </td>
+                    <td class="px-6 py-4 font-body-sm text-body-sm text-secondary">{{ invoice.created_at|date:"M d, Y" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if invoices.has_other_pages %}
+<div class="flex items-center justify-between animate-in animate-in-delay-2">
+    <p class="font-body-sm text-body-sm text-secondary">
+        Showing page {{ invoices.number }} of {{ invoices.paginator.num_pages }}
+    </p>
+    <div class="flex items-center gap-1">
+        {% if invoices.has_previous %}
+        <a href="?{% if current_status %}status={{ current_status }}&{% endif %}page={{ invoices.previous_page_number }}"
+           class="px-3 py-2 rounded-lg border border-border-low-contrast text-on-surface-variant hover:bg-surface-container-low transition-colors font-label-md text-label-md inline-flex items-center gap-1">
+            <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+            Previous
+        </a>
+        {% endif %}
+
+        {% for num in invoices.paginator.page_range %}
+            {% if invoices.number == num %}
+            <span class="px-3 py-2 rounded-lg bg-primary text-on-primary font-label-md text-label-md">{{ num }}</span>
+            {% elif num > invoices.number|add:"-3" and num < invoices.number|add:"3" %}
+            <a href="?{% if current_status %}status={{ current_status }}&{% endif %}page={{ num }}"
+               class="px-3 py-2 rounded-lg border border-border-low-contrast text-on-surface-variant hover:bg-surface-container-low transition-colors font-label-md text-label-md">
+                {{ num }}
+            </a>
+            {% endif %}
+        {% endfor %}
+
+        {% if invoices.has_next %}
+        <a href="?{% if current_status %}status={{ current_status }}&{% endif %}page={{ invoices.next_page_number }}"
+           class="px-3 py-2 rounded-lg border border-border-low-contrast text-on-surface-variant hover:bg-surface-container-low transition-colors font-label-md text-label-md inline-flex items-center gap-1">
+            Next
+            <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+{% else %}
+<!-- Empty State -->
+<div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-16 text-center animate-in animate-in-delay-1">
+    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-surface-container-low flex items-center justify-center">
+        <span class="material-symbols-outlined text-[32px] text-secondary">receipt_long</span>
+    </div>
+    <h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">No Invoices Found</h3>
+    <p class="font-body-md text-body-md text-secondary max-w-md mx-auto">
+        {% if current_status %}
+            No invoices match the selected status filter. Try selecting a different status or view all invoices.
+        {% else %}
+            You haven't created any invoices yet. You can create an invoice from an order's detail page.
+        {% endif %}
+    </p>
+    {% if current_status %}
+    <a href="{% url 'invoice_list' %}" class="inline-flex items-center gap-2 mt-6 bg-primary text-on-primary px-6 py-2.5 rounded-xl font-label-md text-label-md hover:opacity-90 transition-opacity">
+        <span class="material-symbols-outlined text-[18px]">filter_alt_off</span>
+        View All Invoices
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% endwith %}

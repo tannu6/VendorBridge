@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}Quotation Detail — Procurement — VendorBridge{% endblock %}
+{% block page_title %}Quotation Review{% endblock %}
+
+{% block content %}
+<div class="space-y-stack-lg">
+    <div class="flex justify-between items-center">
+        <div>
+            <h2 class="font-headline-md">{{ quotation.quotation_number }}</h2>
+            <p class="text-secondary text-body-sm">RFQ: {{ quotation.rfq.rfq_number }}</p>
+        </div>
+        <span class="status-badge status-{{ quotation.status }}">{{ quotation.get_status_display }}</span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+        <!-- Main Details -->
+        <div class="lg:col-span-2 space-y-gutter">
+            <!-- Vendor Info -->
+            <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+                <h3 class="font-headline-sm mb-4">Vendor Information</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-secondary text-label-md">Company</p>
+                        <p class="font-label-md text-on-surface">{{ quotation.vendor.company_name }}</p>
+                    </div>
+                    <div>
+                        <p class="text-secondary text-label-md">Rating</p>
+                        <p class="font-label-md text-on-surface">{{ quotation.vendor.rating|default:"N/A" }}/5 ⭐</p>
+                    </div>
+                    <div>
+                        <p class="text-secondary text-label-md">Email</p>
+                        <p class="font-label-md text-on-surface">{{ quotation.vendor.contact_email }}</p>
+                    </div>
+                    <div>
+                        <p class="text-secondary text-label-md">Phone</p>
+                        <p class="font-label-md text-on-surface">{{ quotation.vendor.contact_phone }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RFQ Details -->
+            <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+                <h3 class="font-headline-sm mb-4">RFQ Details</h3>
+                <div class="space-y-3">
+                    <div>
+                        <p class="text-secondary text-label-md">Title</p>
+                        <p class="font-label-md text-on-surface">{{ quotation.rfq.title }}</p>
+                    </div>
+                    <div>
+                        <p class="text-secondary text-label-md">Description</p>
+                        <p class="text-body-sm text-on-surface">{{ quotation.rfq.description|linebreaks }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quoted Items -->
+            <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+                <h3 class="font-headline-sm mb-4">Quoted Items</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-surface-container border-b border-border-low-contrast">
+                            <tr>
+                                <th class="px-3 py-2 text-left text-label-md">Item</th>
+                                <th class="px-3 py-2 text-right text-label-md">Qty</th>
+                                <th class="px-3 py-2 text-right text-label-md">Unit Price</th>
+                                <th class="px-3 py-2 text-right text-label-md">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in quotation.quotation_items.all %}
+                            <tr class="border-b border-border-low-contrast">
+                                <td class="px-3 py-2 text-body-sm">{{ item.rfq_item.description }}</td>
+                                <td class="px-3 py-2 text-right text-body-sm">{{ item.rfq_item.quantity }}</td>
+                                <td class="px-3 py-2 text-right text-body-sm">₹{{ item.unit_price|floatformat:2 }}</td>
+                                <td class="px-3 py-2 text-right font-label-md">₹{{ item.total_price|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary & Actions -->
+        <div class="space-y-gutter">
+            <!-- Pricing Summary -->
+            <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+                <h3 class="font-headline-sm mb-4">Summary</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between">
+                        <span class="text-secondary">Subtotal</span>
+                        <span class="font-label-md">₹{{ quotation.total_amount|floatformat:2 }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-secondary">Tax (18%)</span>
+                        <span class="font-label-md">₹{{ quotation.tax_amount|floatformat:2 }}</span>
+                    </div>
+                    <div class="flex justify-between border-t border-border-low-contrast pt-3">
+                        <span class="font-label-md">Grand Total</span>
+                        <span class="font-headline-sm text-on-surface">₹{{ quotation.grand_total|floatformat:2 }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            {% if quotation.status == 'PENDING' %}
+            <form method="post" class="space-y-2">
+                {% csrf_token %}
+                <button type="submit" name="action" value="approve" class="w-full bg-status-approved text-on-surface px-4 py-2.5 rounded-xl font-label-md hover:opacity-90">
+                    ✓ Approve & Create PO
+                </button>
+                <button type="submit" name="action" value="reject" class="w-full bg-status-rejected text-on-surface px-4 py-2.5 rounded-xl font-label-md hover:opacity-90">
+                    ✗ Reject
+                </button>
+            </form>
+            {% endif %}
+
+            <a href="{% url 'proc_quotation_list' %}" class="block text-center text-primary hover:underline font-label-md py-2">← Back to Quotations</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

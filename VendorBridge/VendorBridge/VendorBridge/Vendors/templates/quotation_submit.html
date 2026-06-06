@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+{% with active_page="rfqs" %}
+
+{% block title %}Submit Quotation — {{ rfq.rfq_number }} — VendorBridge{% endblock %}
+{% block page_title %}Submit Quotation{% endblock %}
+
+{% block content %}
+<!-- Back Link -->
+<a href="{% url 'rfq_detail' rfq.id %}" class="inline-flex items-center gap-1.5 text-primary font-label-md text-label-md hover:underline mb-2">
+    <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+    Back to {{ rfq.rfq_number }}
+</a>
+
+<!-- Header -->
+<section class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-6 animate-in">
+    <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-primary-fixed rounded-xl flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary text-[24px]">edit_note</span>
+        </div>
+        <div>
+            <h2 class="font-headline-md text-headline-md text-on-surface">Submit Quotation</h2>
+            <p class="font-body-sm text-body-sm text-secondary">for {{ rfq.rfq_number }} — {{ rfq.title }}</p>
+        </div>
+    </div>
+</section>
+
+<!-- Form Errors (non-field) -->
+{% if form.non_field_errors %}
+<div class="bg-error-container border border-error/20 rounded-xl p-4 animate-in">
+    {% for error in form.non_field_errors %}
+    <p class="text-on-error-container font-body-sm text-body-sm flex items-center gap-2">
+        <span class="material-symbols-outlined text-[16px]">error</span>
+        {{ error }}
+    </p>
+    {% endfor %}
+</div>
+{% endif %}
+
+<form method="POST" action="{% url 'submit_quotation' rfq.id %}" enctype="multipart/form-data" class="space-y-stack-lg">
+    {% csrf_token %}
+
+    <!-- Section 1: Item Pricing -->
+    <section class="bg-surface-container-lowest border border-border-low-contrast rounded-xl overflow-hidden animate-in" style="animation-delay: 50ms;">
+        <div class="p-6 border-b border-border-low-contrast bg-surface-subtle">
+            <h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+                <span class="material-symbols-outlined text-[20px] text-primary">inventory_2</span>
+                Item Pricing
+            </h3>
+            <p class="font-body-sm text-body-sm text-secondary mt-1">Provide unit prices and quantities for each requested item.</p>
+        </div>
+
+        <div class="divide-y divide-border-low-contrast">
+            {% for item in rfq_items %}
+            <div class="p-6">
+                <!-- Item Header -->
+                <div class="flex items-center gap-3 mb-5">
+                    <span class="w-7 h-7 rounded-lg bg-primary-fixed text-primary flex items-center justify-center font-label-md text-label-md font-bold">{{ forloop.counter }}</span>
+                    <div class="flex-1">
+                        <h4 class="font-data-tabular text-data-tabular font-semibold text-on-surface">{{ item.item_name }}</h4>
+                        <p class="font-body-sm text-body-sm text-secondary">{{ item.quantity }} {{ item.unit }}</p>
+                    </div>
+                </div>
+
+                <!-- Item Inputs Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label for="unit_price_{{ item.id }}" class="block font-label-md text-label-md text-secondary uppercase mb-1.5">Unit Price *</label>
+                        <input type="number" name="unit_price_{{ item.id }}" id="unit_price_{{ item.id }}"
+                               step="0.01" min="0" required placeholder="0.00"
+                               class="form-input">
+                    </div>
+                    <div>
+                        <label for="quantity_{{ item.id }}" class="block font-label-md text-label-md text-secondary uppercase mb-1.5">Quantity</label>
+                        <input type="number" name="quantity_{{ item.id }}" id="quantity_{{ item.id }}"
+                               step="1" min="1" value="{{ item.quantity }}"
+                               class="form-input">
+                    </div>
+                    <div>
+                        <label for="remarks_{{ item.id }}" class="block font-label-md text-label-md text-secondary uppercase mb-1.5">Remarks</label>
+                        <input type="text" name="remarks_{{ item.id }}" id="remarks_{{ item.id }}"
+                               placeholder="Optional remarks…"
+                               class="form-input">
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Section 2: Quotation Details -->
+    <section class="bg-surface-container-lowest border border-border-low-contrast rounded-xl overflow-hidden animate-in" style="animation-delay: 100ms;">
+        <div class="p-6 border-b border-border-low-contrast bg-surface-subtle">
+            <h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+                <span class="material-symbols-outlined text-[20px] text-primary">tune</span>
+                Quotation Details
+            </h3>
+            <p class="font-body-sm text-body-sm text-secondary mt-1">Specify delivery, payment, and warranty terms for your quotation.</p>
+        </div>
+
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Delivery Days -->
+                <div>
+                    {{ form.delivery_days.label_tag }}
+                    {{ form.delivery_days }}
+                    {% if form.delivery_days.errors %}
+                    <div class="mt-1">
+                        {% for error in form.delivery_days.errors %}
+                        <p class="text-error font-body-sm text-body-sm flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">error</span>{{ error }}
+                        </p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Payment Terms -->
+                <div>
+                    {{ form.payment_terms.label_tag }}
+                    {{ form.payment_terms }}
+                    {% if form.payment_terms.errors %}
+                    <div class="mt-1">
+                        {% for error in form.payment_terms.errors %}
+                        <p class="text-error font-body-sm text-body-sm flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">error</span>{{ error }}
+                        </p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Warranty Period -->
+                <div>
+                    {{ form.warranty_period.label_tag }}
+                    {{ form.warranty_period }}
+                    {% if form.warranty_period.errors %}
+                    <div class="mt-1">
+                        {% for error in form.warranty_period.errors %}
+                        <p class="text-error font-body-sm text-body-sm flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">error</span>{{ error }}
+                        </p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Validity Period -->
+                <div>
+                    {{ form.validity_period.label_tag }}
+                    {{ form.validity_period }}
+                    {% if form.validity_period.errors %}
+                    <div class="mt-1">
+                        {% for error in form.validity_period.errors %}
+                        <p class="text-error font-body-sm text-body-sm flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">error</span>{{ error }}
+                        </p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Notes (full width) -->
+                <div class="md:col-span-2">
+                    {{ form.notes.label_tag }}
+                    {{ form.notes }}
+                    {% if form.notes.errors %}
+                    <div class="mt-1">
+                        {% for error in form.notes.errors %}
+                        <p class="text-error font-body-sm text-body-sm flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">error</span>{{ error }}
+                        </p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Attachment -->
+                <div class="md:col-span-2">
+                    {{ form.attachment.label_tag }}
+                    <div class="mt-1.5">
+                        {{ form.attachment }}
+                    </div>
+                    {% if form.attachment.errors %}
+                    <div class="mt-1">
+                        {% for error in form.attachment.errors %}
+                        <p class="text-error font-body-sm text-body-sm flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">error</span>{{ error }}
+                        </p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Submit Button -->
+    <div class="flex items-center justify-end gap-3 animate-in" style="animation-delay: 150ms;">
+        <a href="{% url 'rfq_detail' rfq.id %}"
+           class="bg-surface-container-lowest border border-border-low-contrast text-on-surface px-4 py-2.5 rounded-xl font-label-md text-label-md flex items-center gap-2 hover:bg-surface-container-low transition-colors">
+            Cancel
+        </a>
+        <button type="submit"
+                class="bg-primary text-on-primary px-6 py-2.5 rounded-xl font-label-md text-label-md flex items-center gap-2 shadow-sm hover:opacity-90 transition-opacity">
+            <span class="material-symbols-outlined text-[18px]">send</span>
+            Submit Quotation
+        </button>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<style>
+    /* Style Django form labels to match design system */
+    form label {
+        display: block;
+        font-family: 'Inter', sans-serif;
+        font-size: 12px;
+        line-height: 16px;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+        color: #464553;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+    }
+    form input[type="text"],
+    form input[type="number"],
+    form input[type="email"],
+    form input[type="url"],
+    form select,
+    form textarea {
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+        border: 1px solid #E4E8F3;
+        border-radius: 0.5rem;
+        font-size: 14px;
+        line-height: 20px;
+        color: #171c23;
+        background: #ffffff;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        outline: none;
+        font-family: 'Inter', sans-serif;
+    }
+    form input:focus,
+    form select:focus,
+    form textarea:focus {
+        border-color: #504bc0;
+        box-shadow: 0 0 0 3px rgba(80, 75, 192, 0.12);
+    }
+    form textarea { resize: vertical; min-height: 100px; }
+    form select { appearance: auto; }
+</style>
+{% endblock %}
+
+{% endwith %}

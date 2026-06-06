@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>{% block title %}VendorBridge{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary-container": "#6965db",
+                        "primary": "#504bc0",
+                        "primary-fixed": "#e2dfff",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#fefaff",
+                        "on-primary-fixed-variant": "#3a33ab",
+                        "surface": "#f8f9ff",
+                        "surface-subtle": "#F4F7FF",
+                        "surface-container": "#eaeef9",
+                        "surface-container-low": "#f0f3ff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#e4e8f3",
+                        "surface-container-highest": "#dee2ed",
+                        "surface-dim": "#d6dae5",
+                        "surface-variant": "#dee2ed",
+                        "surface-tint": "#534ec3",
+                        "on-surface": "#171c23",
+                        "on-surface-variant": "#464553",
+                        "secondary": "#5f5e5e",
+                        "secondary-container": "#e2dfde",
+                        "secondary-fixed": "#e5e2e1",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-container": "#636262",
+                        "on-secondary-fixed": "#1b1b1c",
+                        "tertiary": "#864e00",
+                        "tertiary-container": "#a86400",
+                        "on-tertiary": "#ffffff",
+                        "outline": "#777585",
+                        "outline-variant": "#c7c4d5",
+                        "border-low-contrast": "#E4E8F3",
+                        "background": "#f8f9ff",
+                        "on-background": "#171c23",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#2c3139",
+                        "inverse-on-surface": "#edf1fc",
+                        "inverse-primary": "#c3c0ff",
+                        "status-approved": "#10B981",
+                        "status-pending": "#F59E0B",
+                        "status-rejected": "#EF4444",
+                        "status-info": "#3B82F6",
+                    },
+                    borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
+                    spacing: { gutter: "16px", "stack-sm": "8px", "stack-md": "16px", base: "4px", "container-margin": "24px", "stack-lg": "32px" },
+                    fontFamily: {
+                        "headline-md": ["Inter"], "body-md": ["Inter"], "display-lg": ["Inter"],
+                        "body-sm": ["Inter"], "label-md": ["Inter"], "data-tabular": ["Inter"],
+                        "headline-sm": ["Inter"], "body-lg": ["Inter"],
+                    },
+                    fontSize: {
+                        "headline-md": ["24px", { lineHeight: "32px", letterSpacing: "-0.01em", fontWeight: "600" }],
+                        "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+                        "display-lg": ["36px", { lineHeight: "44px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "body-sm": ["13px", { lineHeight: "18px", fontWeight: "400" }],
+                        "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600" }],
+                        "data-tabular": ["14px", { lineHeight: "20px", fontWeight: "500" }],
+                        "headline-sm": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+                        "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #dee2ed; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #c7c4d5; }
+        .form-input {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            border: 1px solid #E4E8F3;
+            border-radius: 0.5rem;
+            font-size: 14px;
+            line-height: 20px;
+            color: #171c23;
+            background: #ffffff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+        }
+        .form-input:focus {
+            border-color: #504bc0;
+            box-shadow: 0 0 0 3px rgba(80, 75, 192, 0.12);
+        }
+        .form-input::placeholder { color: #777585; }
+        select.form-input { appearance: auto; }
+        textarea.form-input { resize: vertical; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(228, 232, 243, 0.8);
+        }
+        .sidebar-link {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.75rem 1rem; border-radius: 0.5rem;
+            margin: 0.125rem 0.5rem; transition: all 0.2s;
+            font-size: 12px; line-height: 16px; letter-spacing: 0.05em; font-weight: 600;
+            font-family: 'Inter', sans-serif;
+        }
+        .sidebar-link:hover { background: #dee2ed; }
+        .sidebar-link.active {
+            background: #6965db; color: #fefaff;
+        }
+        .sidebar-link:not(.active) { color: #464553; }
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 2px 10px; border-radius: 9999px;
+            font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+        }
+        .status-pending { background: #FEF3C7; color: #92400E; }
+        .status-approved, .status-accepted, .status-acknowledged, .status-completed, .status-paid { background: #D1FAE5; color: #065F46; }
+        .status-rejected, .status-cancelled, .status-disputed { background: #FEE2E2; color: #991B1B; }
+        .status-submitted, .status-under_review, .status-issued, .status-in_progress, .status-published { background: #DBEAFE; color: #1E40AF; }
+        .status-draft { background: #F3F4F6; color: #374151; }
+        .status-shortlisted { background: #EDE9FE; color: #5B21B6; }
+        .status-withdrawn, .status-overdue { background: #FFF7ED; color: #9A3412; }
+        .status-suspended, .status-blacklisted { background: #FEE2E2; color: #991B1B; }
+        .status-partially_delivered, .status-partially_paid { background: #FEF3C7; color: #92400E; }
+        .status-delivered { background: #D1FAE5; color: #065F46; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in { animation: fadeInUp 0.4s ease-out forwards; }
+        .animate-in-delay-1 { animation-delay: 0.05s; }
+        .animate-in-delay-2 { animation-delay: 0.1s; }
+        .animate-in-delay-3 { animation-delay: 0.15s; }
+        .animate-in-delay-4 { animation-delay: 0.2s; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-hidden">
+
+<!-- Sidebar -->
+<aside class="fixed left-0 top-0 bottom-0 flex flex-col z-50 overflow-y-auto bg-surface-subtle border-r border-border-low-contrast w-64">
+    <div class="px-6 py-8">
+        <div class="flex items-center gap-3 mb-12">
+            <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-on-primary">
+                <span class="material-symbols-outlined text-headline-sm" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+            </div>
+            <div>
+                <h1 class="font-headline-sm text-headline-sm font-black text-primary leading-tight">VendorBridge</h1>
+                <p class="font-label-md text-label-md text-secondary uppercase tracking-widest">Vendor Portal</p>
+            </div>
+        </div>
+        <nav class="space-y-1">
+            <a class="sidebar-link {% if active_page == 'dashboard' %}active{% endif %}" href="{% url 'vendor_dashboard' %}">
+                <span class="material-symbols-outlined" {% if active_page == 'dashboard' %}style="font-variation-settings: 'FILL' 1;"{% endif %}>dashboard</span>
+                Dashboard
+            </a>
+            <a class="sidebar-link {% if active_page == 'rfqs' %}active{% endif %}" href="{% url 'rfq_list' %}">
+                <span class="material-symbols-outlined" {% if active_page == 'rfqs' %}style="font-variation-settings: 'FILL' 1;"{% endif %}>request_quote</span>
+                Browse RFQs
+            </a>
+            <a class="sidebar-link {% if active_page == 'quotations' %}active{% endif %}" href="{% url 'quotation_list' %}">
+                <span class="material-symbols-outlined" {% if active_page == 'quotations' %}style="font-variation-settings: 'FILL' 1;"{% endif %}>description</span>
+                My Quotations
+            </a>
+            <a class="sidebar-link {% if active_page == 'orders' %}active{% endif %}" href="{% url 'order_list' %}">
+                <span class="material-symbols-outlined" {% if active_page == 'orders' %}style="font-variation-settings: 'FILL' 1;"{% endif %}>shopping_cart</span>
+                My Orders
+            </a>
+            <a class="sidebar-link {% if active_page == 'invoices' %}active{% endif %}" href="{% url 'invoice_list' %}">
+                <span class="material-symbols-outlined" {% if active_page == 'invoices' %}style="font-variation-settings: 'FILL' 1;"{% endif %}>receipt_long</span>
+                Invoices
+            </a>
+            <a class="sidebar-link {% if active_page == 'profile' %}active{% endif %}" href="{% url 'vendor_profile' %}">
+                <span class="material-symbols-outlined" {% if active_page == 'profile' %}style="font-variation-settings: 'FILL' 1;"{% endif %}>business</span>
+                Company Profile
+            </a>
+            <a class="sidebar-link {% if active_page == 'documents' %}active{% endif %}" href="{% url 'vendor_documents' %}">
+                <span class="material-symbols-outlined" {% if active_page == 'documents' %}style="font-variation-settings: 'FILL' 1;"{% endif %}>folder_open</span>
+                Documents
+            </a>
+        </nav>
+    </div>
+    <div class="mt-auto border-t border-border-low-contrast p-4 space-y-1">
+        <a class="sidebar-link {% if active_page == 'notifications' %}active{% endif %}" href="{% url 'notification_list' %}">
+            <span class="material-symbols-outlined">notifications</span>
+            Notifications
+            {% if unread_count %}
+            <span class="ml-auto bg-error text-on-error text-[10px] font-bold px-1.5 py-0.5 rounded-full">{{ unread_count }}</span>
+            {% endif %}
+        </a>
+        <a class="sidebar-link text-error hover:!bg-error-container" href="{% url 'vendor_logout' %}">
+            <span class="material-symbols-outlined">logout</span>
+            Log Out
+        </a>
+    </div>
+</aside>
+
+<!-- Main Content -->
+<div class="flex flex-col flex-1 ml-64 min-h-screen">
+    <!-- Header -->
+    <header class="flex justify-between items-center h-16 px-gutter w-full sticky top-0 z-40 bg-surface-container-lowest border-b border-border-low-contrast">
+        <div class="flex items-center gap-stack-md flex-1">
+            <h2 class="font-headline-sm text-headline-sm text-on-surface">{% block page_title %}Dashboard{% endblock %}</h2>
+        </div>
+        <div class="flex items-center gap-4">
+            <a href="{% url 'notification_list' %}" class="w-10 h-10 flex items-center justify-center text-secondary hover:bg-surface-container-low rounded-full transition-colors relative">
+                <span class="material-symbols-outlined">notifications</span>
+                {% if unread_count %}
+                <span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+                {% endif %}
+            </a>
+            <a href="{% url 'vendor_profile' %}" class="w-10 h-10 flex items-center justify-center text-secondary hover:bg-surface-container-low rounded-full transition-colors">
+                <span class="material-symbols-outlined">settings</span>
+            </a>
+            {% if user.is_staff %}
+            <a href="/admin/" title="Admin Panel" class="w-10 h-10 flex items-center justify-center text-primary hover:bg-primary-fixed rounded-full transition-colors font-bold">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">admin_panel_settings</span>
+            </a>
+            {% endif %}
+            <div class="h-8 w-px bg-border-low-contrast mx-2"></div>
+            <div class="flex items-center gap-3 pl-2">
+                <div class="text-right">
+                    <p class="font-label-md text-label-md text-on-surface">{{ user.first_name }} {{ user.last_name }}</p>
+                    {% if vendor %}
+                    <p class="text-[10px] text-secondary uppercase font-bold tracking-tighter">{{ vendor.company_name }}</p>
+                    {% endif %}
+                </div>
+                <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold">
+                    {{ user.first_name.0 }}{{ user.last_name.0 }}
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="px-gutter lg:px-10 pt-4">
+        {% for message in messages %}
+        <div class="p-3 rounded-xl mb-2 flex items-center gap-2 text-body-sm animate-in
+            {% if message.tags == 'success' %}bg-status-approved/10 text-status-approved border border-status-approved/20
+            {% elif message.tags == 'error' %}bg-error-container text-on-error-container border border-error/20
+            {% elif message.tags == 'warning' %}bg-status-pending/10 text-status-pending border border-status-pending/20
+            {% else %}bg-status-info/10 text-status-info border border-status-info/20{% endif %}">
+            <span class="material-symbols-outlined text-[18px]">
+                {% if message.tags == 'success' %}check_circle
+                {% elif message.tags == 'error' %}error
+                {% elif message.tags == 'warning' %}warning
+                {% else %}info{% endif %}
+            </span>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Page Content -->
+    <main class="flex-1 overflow-y-auto p-gutter lg:p-10 space-y-stack-lg max-w-[1400px] mx-auto w-full">
+        {% block content %}{% endblock %}
+    </main>
+</div>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

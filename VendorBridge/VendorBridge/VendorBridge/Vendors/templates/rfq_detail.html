@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+{% with active_page="rfqs" %}
+
+{% block title %}{{ rfq.rfq_number }} — VendorBridge{% endblock %}
+{% block page_title %}RFQ Details{% endblock %}
+
+{% block content %}
+<!-- Back Link -->
+<a href="{% url 'rfq_list' %}" class="inline-flex items-center gap-1.5 text-primary font-label-md text-label-md hover:underline mb-2">
+    <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+    Back to Browse RFQs
+</a>
+
+<!-- RFQ Header Card -->
+<section class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-6 animate-in">
+    <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+        <div class="flex-1 min-w-0">
+            <p class="font-label-md text-label-md text-primary mb-1">{{ rfq.rfq_number }}</p>
+            <h2 class="font-headline-md text-headline-md text-on-surface mb-3">{{ rfq.title }}</h2>
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="status-badge status-{{ rfq.status }}">{{ rfq.get_status_display }}</span>
+                <span class="status-badge status-{{ rfq.priority }}">{{ rfq.priority }}</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Info Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter animate-in" style="animation-delay: 50ms;">
+    <!-- Category -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-[18px] text-outline">category</span>
+            <p class="font-label-md text-label-md text-secondary uppercase">Category</p>
+        </div>
+        <p class="font-body-lg text-body-lg text-on-surface">{{ rfq.category|default:"—" }}</p>
+    </div>
+
+    <!-- Published Date -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-[18px] text-outline">event</span>
+            <p class="font-label-md text-label-md text-secondary uppercase">Published Date</p>
+        </div>
+        <p class="font-body-lg text-body-lg text-on-surface">{{ rfq.published_date|date:"M d, Y" }}</p>
+    </div>
+
+    <!-- Submission Deadline -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-[18px] text-outline">timer</span>
+            <p class="font-label-md text-label-md text-secondary uppercase">Submission Deadline</p>
+        </div>
+        <p class="font-body-lg text-body-lg text-on-surface">{{ rfq.submission_deadline|date:"M d, Y h:i A" }}</p>
+        {% if rfq.is_open %}
+        <p class="font-label-md text-label-md text-status-pending mt-1" id="deadline-countdown"></p>
+        {% else %}
+        <p class="font-label-md text-label-md text-status-rejected mt-1">Closed</p>
+        {% endif %}
+    </div>
+
+    <!-- Delivery Deadline -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-[18px] text-outline">local_shipping</span>
+            <p class="font-label-md text-label-md text-secondary uppercase">Delivery Deadline</p>
+        </div>
+        <p class="font-body-lg text-body-lg text-on-surface">{{ rfq.delivery_deadline|date:"M d, Y"|default:"—" }}</p>
+    </div>
+
+    <!-- Payment Terms -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-[18px] text-outline">account_balance_wallet</span>
+            <p class="font-label-md text-label-md text-secondary uppercase">Payment Terms</p>
+        </div>
+        <p class="font-body-lg text-body-lg text-on-surface">{{ rfq.payment_terms|default:"—" }}</p>
+    </div>
+
+    <!-- Delivery Location -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-[18px] text-outline">location_on</span>
+            <p class="font-label-md text-label-md text-secondary uppercase">Delivery Location</p>
+        </div>
+        <p class="font-body-lg text-body-lg text-on-surface">{{ rfq.delivery_location|default:"—" }}</p>
+    </div>
+
+    <!-- Estimated Budget (conditional) -->
+    {% if rfq.show_budget_to_vendors %}
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-[18px] text-outline">payments</span>
+            <p class="font-label-md text-label-md text-secondary uppercase">Estimated Budget</p>
+        </div>
+        <p class="font-body-lg text-body-lg text-on-surface font-semibold">{{ rfq.estimated_budget }}</p>
+    </div>
+    {% endif %}
+</section>
+
+<!-- Description -->
+<section class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-6 animate-in" style="animation-delay: 100ms;">
+    <h3 class="font-headline-sm text-headline-sm text-on-surface mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-[20px] text-primary">description</span>
+        Description
+    </h3>
+    <div class="font-body-md text-body-md text-on-surface-variant leading-relaxed whitespace-pre-line">{{ rfq.description }}</div>
+</section>
+
+<!-- Terms & Conditions -->
+{% if rfq.terms_and_conditions %}
+<section class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-6 animate-in" style="animation-delay: 150ms;">
+    <h3 class="font-headline-sm text-headline-sm text-on-surface mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-[20px] text-primary">gavel</span>
+        Terms & Conditions
+    </h3>
+    <div class="font-body-md text-body-md text-on-surface-variant leading-relaxed whitespace-pre-line">{{ rfq.terms_and_conditions }}</div>
+</section>
+{% endif %}
+
+<!-- Items Table -->
+<section class="bg-surface-container-lowest border border-border-low-contrast rounded-xl overflow-hidden animate-in" style="animation-delay: 200ms;">
+    <div class="p-6 pb-0">
+        <h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+            <span class="material-symbols-outlined text-[20px] text-primary">inventory_2</span>
+            Requested Items
+        </h3>
+    </div>
+    <div class="overflow-x-auto mt-4">
+        <table class="w-full text-left border-collapse">
+            <thead class="bg-surface-subtle border-y border-border-low-contrast">
+                <tr>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">#</th>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Item Name</th>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Description</th>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Quantity</th>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Unit</th>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Specifications</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-border-low-contrast">
+                {% for item in rfq.items.all %}
+                <tr class="hover:bg-primary/5 transition-colors">
+                    <td class="px-6 py-4 font-data-tabular text-data-tabular text-secondary">{{ forloop.counter }}</td>
+                    <td class="px-6 py-4 font-data-tabular text-data-tabular font-semibold">{{ item.item_name }}</td>
+                    <td class="px-6 py-4 font-body-sm text-body-sm text-secondary max-w-xs">{{ item.description|default:"—" }}</td>
+                    <td class="px-6 py-4 font-data-tabular text-data-tabular">{{ item.quantity }}</td>
+                    <td class="px-6 py-4 font-data-tabular text-data-tabular">{{ item.unit }}</td>
+                    <td class="px-6 py-4 font-body-sm text-body-sm text-secondary max-w-xs">{{ item.specifications|default:"—" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="px-6 py-8 text-center text-secondary font-body-md">No items listed.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- Attachment -->
+{% if rfq.attachment %}
+<section class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-6 animate-in" style="animation-delay: 250ms;">
+    <h3 class="font-headline-sm text-headline-sm text-on-surface mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-[20px] text-primary">attach_file</span>
+        Attachment
+    </h3>
+    <a href="{{ rfq.attachment.url }}" download
+       class="inline-flex items-center gap-2 px-4 py-2.5 bg-surface-container-low border border-border-low-contrast rounded-xl hover:bg-primary-fixed transition-colors font-label-md text-label-md text-primary">
+        <span class="material-symbols-outlined text-[18px]">download</span>
+        Download Attachment
+    </a>
+</section>
+{% endif %}
+
+<!-- Bottom Actions -->
+<section class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-6 animate-in" style="animation-delay: 300ms;">
+    <div class="flex flex-col sm:flex-row items-center gap-4">
+        {% if existing_quotation %}
+        <div class="flex flex-col sm:flex-row items-center gap-3 w-full">
+            <span class="status-badge status-submitted py-2 px-4">
+                <span class="material-symbols-outlined text-[14px]">check_circle</span>
+                Quotation Already Submitted
+            </span>
+            <a href="{% url 'quotation_detail' existing_quotation.id %}"
+               class="bg-surface-container-lowest border border-border-low-contrast text-on-surface px-4 py-2.5 rounded-xl font-label-md text-label-md flex items-center gap-2 hover:bg-surface-container-low transition-colors">
+                <span class="material-symbols-outlined text-[18px]">visibility</span>
+                View Your Quotation
+            </a>
+        </div>
+        {% elif rfq.is_open %}
+        <a href="{% url 'submit_quotation' rfq.id %}"
+           class="bg-primary text-on-primary px-6 py-2.5 rounded-xl font-label-md text-label-md flex items-center gap-2 shadow-sm hover:opacity-90 transition-opacity">
+            <span class="material-symbols-outlined text-[18px]">edit_note</span>
+            Submit Quotation
+        </a>
+        {% else %}
+        <span class="status-badge status-rejected py-2 px-4">
+            <span class="material-symbols-outlined text-[14px]">lock</span>
+            Submissions Closed
+        </span>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+{% if rfq.is_open %}
+<script>
+(function() {
+    const deadline = new Date("{{ rfq.submission_deadline|date:'c' }}").getTime();
+    const el = document.getElementById('deadline-countdown');
+    if (!el) return;
+    function update() {
+        const now = Date.now();
+        const diff = deadline - now;
+        if (diff <= 0) { el.textContent = 'Deadline passed'; return; }
+        const days = Math.floor(diff / 86400000);
+        const hours = Math.floor((diff % 86400000) / 3600000);
+        const mins = Math.floor((diff % 3600000) / 60000);
+        let parts = [];
+        if (days > 0) parts.push(days + 'd');
+        parts.push(hours + 'h');
+        parts.push(mins + 'm remaining');
+        el.textContent = parts.join(' ');
+    }
+    update();
+    setInterval(update, 60000);
+})();
+</script>
+{% endif %}
+{% endblock %}
+
+{% endwith %}

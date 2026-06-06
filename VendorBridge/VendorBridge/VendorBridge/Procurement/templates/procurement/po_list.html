@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Purchase Orders — Procurement — VendorBridge{% endblock %}
+{% block page_title %}Purchase Orders{% endblock %}
+
+{% block content %}
+<div class="space-y-stack-lg">
+    <h2 class="font-headline-md text-headline-md">Purchase Orders</h2>
+
+    <!-- Filters -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <form method="get" class="flex gap-4 flex-wrap">
+            <input type="text" name="search" placeholder="Search PO..." value="{{ request.GET.search }}" class="px-3 py-2 rounded border border-border-low-contrast flex-1 min-w-48">
+            <select name="status" class="px-3 py-2 rounded border border-border-low-contrast">
+                <option value="">All Statuses</option>
+                <option value="ISSUED" {% if request.GET.status == 'ISSUED' %}selected{% endif %}>Issued</option>
+                <option value="DELIVERED" {% if request.GET.status == 'DELIVERED' %}selected{% endif %}>Delivered</option>
+            </select>
+            <button type="submit" class="bg-primary text-on-primary px-6 py-2.5 rounded-xl font-label-md">Filter</button>
+        </form>
+    </div>
+
+    <!-- POs Table -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl overflow-hidden">
+        <table class="w-full">
+            <thead class="bg-surface-container border-b border-border-low-contrast">
+                <tr>
+                    <th class="px-5 py-3 text-left font-label-md">PO Number</th>
+                    <th class="px-5 py-3 text-left font-label-md">Vendor</th>
+                    <th class="px-5 py-3 text-left font-label-md">Total</th>
+                    <th class="px-5 py-3 text-left font-label-md">Items</th>
+                    <th class="px-5 py-3 text-left font-label-md">Status</th>
+                    <th class="px-5 py-3 text-center font-label-md">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for po in pos %}
+                <tr class="border-b border-border-low-contrast hover:bg-surface-container transition">
+                    <td class="px-5 py-3 font-label-md">{{ po.po_number }}</td>
+                    <td class="px-5 py-3 text-body-sm">{{ po.vendor.company_name }}</td>
+                    <td class="px-5 py-3 font-label-md">₹{{ po.total_amount|floatformat:2 }}</td>
+                    <td class="px-5 py-3 text-body-sm">{{ po.items.count }}</td>
+                    <td class="px-5 py-3">
+                        <span class="status-badge status-{{ po.status }}">{{ po.get_status_display }}</span>
+                    </td>
+                    <td class="px-5 py-3 text-center">
+                        <a href="{% url 'po_detail' po.id %}" class="text-primary hover:underline font-label-md">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="px-5 py-8 text-center text-secondary">No purchase orders yet</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% with active_page="rfqs" %}
+
+{% block title %}Browse RFQs — VendorBridge{% endblock %}
+{% block page_title %}Browse RFQs{% endblock %}
+
+{% block content %}
+<!-- Search & Filters -->
+<section class="animate-in">
+    <form method="GET" action="{% url 'rfq_list' %}" class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <div class="flex flex-col lg:flex-row gap-4">
+            <!-- Search Input -->
+            <div class="relative flex-1">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">search</span>
+                <input type="text" name="search" value="{{ search }}" placeholder="Search by RFQ number, title, or description…"
+                       class="form-input pl-10">
+            </div>
+            <!-- Priority Filter -->
+            <div class="w-full lg:w-48">
+                <select name="priority" class="form-input">
+                    <option value="">All Priorities</option>
+                    <option value="low" {% if priority == 'low' %}selected{% endif %}>Low</option>
+                    <option value="medium" {% if priority == 'medium' %}selected{% endif %}>Medium</option>
+                    <option value="high" {% if priority == 'high' %}selected{% endif %}>High</option>
+                    <option value="urgent" {% if priority == 'urgent' %}selected{% endif %}>Urgent</option>
+                </select>
+            </div>
+            <!-- Filter Button -->
+            <button type="submit"
+                    class="bg-primary text-on-primary px-6 py-2.5 rounded-xl font-label-md text-label-md flex items-center gap-2 hover:opacity-90 transition-opacity whitespace-nowrap">
+                <span class="material-symbols-outlined text-[18px]">filter_list</span>
+                Apply Filters
+            </button>
+        </div>
+    </form>
+</section>
+
+<!-- RFQ Cards Grid -->
+{% if rfqs %}
+<section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter">
+    {% for rfq in rfqs %}
+    <div class="animate-in bg-surface-container-lowest border border-border-low-contrast rounded-xl p-6 flex flex-col hover:border-primary-container hover:shadow-md transition-all group"
+         style="animation-delay: {{ forloop.counter0 }}00ms; opacity: 0;">
+        <!-- Card Header -->
+        <div class="flex items-start justify-between mb-4">
+            <div class="flex-1 min-w-0">
+                <p class="font-label-md text-label-md text-primary mb-1">{{ rfq.rfq_number }}</p>
+                <h3 class="font-headline-sm text-headline-sm text-on-surface truncate" title="{{ rfq.title }}">{{ rfq.title }}</h3>
+            </div>
+            <span class="status-badge status-{{ rfq.priority }} ml-3 shrink-0">{{ rfq.priority }}</span>
+        </div>
+
+        <!-- Description -->
+        <p class="font-body-sm text-body-sm text-secondary mb-5 line-clamp-2">{{ rfq.description|truncatewords:25 }}</p>
+
+        <!-- Card Details -->
+        <div class="space-y-3 mb-6 flex-1">
+            {% if rfq.category %}
+            <div class="flex items-center gap-2 text-body-sm">
+                <span class="material-symbols-outlined text-[16px] text-outline">category</span>
+                <span class="text-secondary">{{ rfq.category }}</span>
+            </div>
+            {% endif %}
+            <div class="flex items-center gap-2 text-body-sm">
+                <span class="material-symbols-outlined text-[16px] text-outline">schedule</span>
+                <span class="text-secondary">Deadline: {{ rfq.submission_deadline|date:"M d, Y" }}</span>
+            </div>
+            {% if rfq.show_budget_to_vendors and rfq.estimated_budget %}
+            <div class="flex items-center gap-2 text-body-sm">
+                <span class="material-symbols-outlined text-[16px] text-outline">payments</span>
+                <span class="text-secondary">Budget: {{ rfq.estimated_budget }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Card Action -->
+        <div class="pt-4 border-t border-border-low-contrast">
+            {% if rfq.id in quoted_rfq_ids %}
+            <span class="status-badge status-approved w-full justify-center py-2">
+                <span class="material-symbols-outlined text-[14px]">check_circle</span>
+                Already Quoted
+            </span>
+            {% else %}
+            <a href="{% url 'rfq_detail' rfq.id %}"
+               class="bg-primary text-on-primary px-6 py-2.5 rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 hover:opacity-90 transition-opacity w-full">
+                <span class="material-symbols-outlined text-[18px]">visibility</span>
+                View & Quote
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</section>
+
+<!-- Pagination -->
+{% if rfqs.has_other_pages %}
+<nav class="flex items-center justify-center gap-2 pt-4 animate-in">
+    <div class="flex items-center gap-1 bg-surface-container-lowest border border-border-low-contrast rounded-xl p-1.5">
+        {% if rfqs.has_previous %}
+        <a href="?page={{ rfqs.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if priority %}&priority={{ priority }}{% endif %}"
+           class="flex items-center gap-1 px-3 py-2 rounded-lg text-primary hover:bg-primary-fixed transition-colors font-label-md text-label-md">
+            <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+            Previous
+        </a>
+        {% endif %}
+
+        {% for page_num in rfqs.paginator.page_range %}
+            {% if rfqs.number == page_num %}
+            <span class="px-3 py-2 rounded-lg bg-primary text-on-primary font-label-md text-label-md min-w-[36px] text-center">{{ page_num }}</span>
+            {% elif page_num > rfqs.number|add:'-3' and page_num < rfqs.number|add:'3' %}
+            <a href="?page={{ page_num }}{% if search %}&search={{ search }}{% endif %}{% if priority %}&priority={{ priority }}{% endif %}"
+               class="px-3 py-2 rounded-lg text-on-surface hover:bg-surface-container-low transition-colors font-label-md text-label-md min-w-[36px] text-center">{{ page_num }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if rfqs.has_next %}
+        <a href="?page={{ rfqs.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if priority %}&priority={{ priority }}{% endif %}"
+           class="flex items-center gap-1 px-3 py-2 rounded-lg text-primary hover:bg-primary-fixed transition-colors font-label-md text-label-md">
+            Next
+            <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+        </a>
+        {% endif %}
+    </div>
+</nav>
+{% endif %}
+
+{% else %}
+<!-- Empty State -->
+<section class="animate-in flex flex-col items-center justify-center py-20">
+    <div class="w-20 h-20 rounded-full bg-surface-container-low flex items-center justify-center mb-6">
+        <span class="material-symbols-outlined text-[40px] text-outline">request_quote</span>
+    </div>
+    <h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">No RFQs Found</h3>
+    <p class="font-body-md text-body-md text-secondary text-center max-w-md mb-6">
+        {% if search or priority %}
+        No RFQs match your current filters. Try adjusting your search criteria or clearing the filters.
+        {% else %}
+        There are no open RFQs available at the moment. Check back later for new opportunities.
+        {% endif %}
+    </p>
+    {% if search or priority %}
+    <a href="{% url 'rfq_list' %}"
+       class="bg-surface-container-lowest border border-border-low-contrast text-on-surface px-4 py-2.5 rounded-xl font-label-md text-label-md flex items-center gap-2 hover:bg-surface-container-low transition-colors">
+        <span class="material-symbols-outlined text-[18px]">filter_list_off</span>
+        Clear Filters
+    </a>
+    {% endif %}
+</section>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<style>
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}
+
+{% endwith %}

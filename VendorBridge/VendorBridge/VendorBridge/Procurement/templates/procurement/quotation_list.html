@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Quotations — Procurement — VendorBridge{% endblock %}
+{% block page_title %}Quotation Review{% endblock %}
+
+{% block content %}
+<div class="space-y-stack-lg">
+    <div class="flex justify-between items-center">
+        <h2 class="font-headline-md text-headline-md">Quotations</h2>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <form method="get" class="flex gap-4 flex-wrap">
+            <input type="text" name="search" placeholder="Search RFQ..." value="{{ request.GET.search }}" class="px-3 py-2 rounded border border-border-low-contrast flex-1 min-w-48">
+            <select name="status" class="px-3 py-2 rounded border border-border-low-contrast">
+                <option value="">All Statuses</option>
+                <option value="PENDING" {% if request.GET.status == 'PENDING' %}selected{% endif %}>Pending</option>
+                <option value="APPROVED" {% if request.GET.status == 'APPROVED' %}selected{% endif %}>Approved</option>
+                <option value="REJECTED" {% if request.GET.status == 'REJECTED' %}selected{% endif %}>Rejected</option>
+            </select>
+            <button type="submit" class="bg-primary text-on-primary px-6 py-2.5 rounded-xl font-label-md">Filter</button>
+        </form>
+    </div>
+
+    <!-- Quotations -->
+    <div class="grid grid-cols-1 gap-gutter">
+        {% for quotation in quotations %}
+        <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="font-headline-sm">{{ quotation.quotation_number }}</p>
+                    <p class="text-body-sm text-secondary">RFQ: {{ quotation.rfq.rfq_number }} — {{ quotation.rfq.title|truncatewords:6 }}</p>
+                    <p class="text-body-sm text-secondary mt-1">Vendor: <strong>{{ quotation.vendor.company_name }}</strong></p>
+                </div>
+                <span class="status-badge status-{{ quotation.status }}">{{ quotation.get_status_display }}</span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-border-low-contrast">
+                <div>
+                    <p class="text-secondary text-label-md">Total Amount</p>
+                    <p class="font-headline-sm text-on-surface">₹{{ quotation.total_amount|floatformat:2 }}</p>
+                </div>
+                <div>
+                    <p class="text-secondary text-label-md">Tax (18%)</p>
+                    <p class="font-headline-sm text-on-surface">₹{{ quotation.tax_amount|floatformat:2 }}</p>
+                </div>
+                <div>
+                    <p class="text-secondary text-label-md">Grand Total</p>
+                    <p class="font-headline-sm text-on-surface">₹{{ quotation.grand_total|floatformat:2 }}</p>
+                </div>
+            </div>
+
+            <div class="flex gap-2 mt-4">
+                <a href="{% url 'proc_quotation_detail' quotation.id %}" class="text-primary hover:underline text-label-md">View Details →</a>
+                {% if quotation.status == 'PENDING' %}
+                    <a href="{% url 'quotation_approve' quotation.id %}" class="bg-status-approved/20 text-status-approved px-4 py-2 rounded font-label-md hover:bg-status-approved/30">Approve</a>
+                    <a href="{% url 'quotation_reject' quotation.id %}" class="bg-status-rejected/20 text-status-rejected px-4 py-2 rounded font-label-md hover:bg-status-rejected/30">Reject</a>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-8">
+            <p class="text-secondary">No quotations received yet</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

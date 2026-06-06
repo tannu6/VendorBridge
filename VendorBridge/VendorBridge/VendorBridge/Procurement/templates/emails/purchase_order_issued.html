@@ -1,0 +1,67 @@
+<html>
+<body style="font-family: Arial, sans-serif; color: #333;">
+<table width="100%" style="max-width: 600px; margin: 0 auto; border-collapse: collapse;">
+<tr>
+    <td style="padding: 20px; background-color: #f5f5f5; text-align: center;">
+        <h1 style="color: #2563eb; margin: 0;">VendorBridge</h1>
+    </td>
+</tr>
+<tr>
+    <td style="padding: 20px;">
+        <h2>Purchase Order Issued</h2>
+        <p>Dear {{ vendor.company_name }},</p>
+        
+        <p>A new Purchase Order has been issued to you. Please review the details below and acknowledge receipt.</p>
+        
+        <table style="width: 100%; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 4px; margin: 15px 0;">
+            <tr>
+                <td style="padding: 10px; font-weight: bold;">Purchase Order Number:</td>
+                <td style="padding: 10px; font-weight: bold; color: #2563eb;">{{ purchase_order.po_number }}</td>
+            </tr>
+            <tr style="background-color: #f0f0f0;">
+                <td style="padding: 10px; font-weight: bold;">Issue Date:</td>
+                <td style="padding: 10px;">{{ purchase_order.issued_date|date:"M d, Y" }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; font-weight: bold;">Total Amount:</td>
+                <td style="padding: 10px; font-weight: bold; color: #10b981;">₹{{ purchase_order.grand_total|floatformat:2 }}</td>
+            </tr>
+            <tr style="background-color: #f0f0f0;">
+                <td style="padding: 10px; font-weight: bold;">Expected Delivery:</td>
+                <td style="padding: 10px;">{{ purchase_order.expected_delivery_date|date:"M d, Y"|default:"Not specified" }}</td>
+            </tr>
+        </table>
+        
+        <h3>Ordered Items:</h3>
+        <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+            <tr style="background-color: #f0f0f0; border-bottom: 2px solid #ddd;">
+                <th style="padding: 10px; text-align: left;">Item</th>
+                <th style="padding: 10px; text-align: right;">Qty</th>
+                <th style="padding: 10px; text-align: right;">Unit Price</th>
+                <th style="padding: 10px; text-align: right;">Total</th>
+            </tr>
+            {% for item in po_items %}
+            <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 10px;">{{ item.description }}</td>
+                <td style="padding: 10px; text-align: right;">{{ item.quantity }}</td>
+                <td style="padding: 10px; text-align: right;">₹{{ item.unit_price|floatformat:2 }}</td>
+                <td style="padding: 10px; text-align: right;">₹{{ item.total_price|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        
+        <p><a href="{{ acknowledge_url }}" style="display: inline-block; background-color: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">Acknowledge Receipt</a></p>
+        
+        <p>Please confirm receipt and start fulfillment according to the delivery schedule.</p>
+        
+        <p>Best regards,<br>VendorBridge Team</p>
+    </td>
+</tr>
+<tr>
+    <td style="padding: 15px; background-color: #f5f5f5; text-align: center; color: #666; font-size: 12px;">
+        <p>© 2024 VendorBridge. All rights reserved.</p>
+    </td>
+</tr>
+</table>
+</body>
+</html>

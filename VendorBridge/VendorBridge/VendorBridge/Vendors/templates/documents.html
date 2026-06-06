@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+{% with active_page="documents" %}
+
+{% block title %}Documents & Certificates – VendorBridge{% endblock %}
+{% block page_title %}Documents & Certificates{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="animate-in">
+    <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-primary-fixed flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary text-headline-sm" style="font-variation-settings: 'FILL' 1;">folder_open</span>
+        </div>
+        <div>
+            <h2 class="font-headline-md text-headline-md text-on-surface">Documents & Certificates</h2>
+            <p class="font-body-sm text-body-sm text-secondary mt-0.5">Upload and manage your company documents</p>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Form Card -->
+<div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-6 animate-in animate-in-delay-1">
+    <div class="flex items-center gap-2 pb-4 border-b border-border-low-contrast mb-6">
+        <span class="material-symbols-outlined text-primary text-[20px]">upload_file</span>
+        <h3 class="font-headline-sm text-headline-sm text-on-surface">Upload New Document</h3>
+    </div>
+
+    <!-- Non-field Errors -->
+    {% if form.non_field_errors %}
+    <div class="bg-error-container border border-error/20 rounded-xl p-3 mb-6">
+        <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-on-error-container text-[20px] mt-0.5">error</span>
+            <div>
+                {% for error in form.non_field_errors %}
+                <p class="font-body-md text-body-md text-on-error-container">{{ error }}</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <form method="POST" action="{% url 'vendor_documents' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for field in form %}
+            <div class="{% if field.name == 'notes' %}md:col-span-2{% endif %}">
+                <label for="{{ field.id_for_label }}" class="block font-label-md text-label-md text-on-surface mb-2">
+                    {{ field.label }}
+                    {% if field.field.required %}<span class="text-error">*</span>{% endif %}
+                </label>
+
+                {% if field.field.widget.input_type == 'file' %}
+                <input type="file" name="{{ field.html_name }}" id="{{ field.id_for_label }}"
+                       class="form-input file:mr-4 file:py-1 file:px-4 file:rounded-lg file:border-0 file:font-label-md file:text-label-md file:bg-primary-fixed file:text-primary hover:file:bg-primary-fixed-dim file:cursor-pointer"
+                       {% if field.field.required %}required{% endif %}>
+                {% else %}
+                {{ field }}
+                {% endif %}
+
+                {% if field.help_text %}<p class="mt-1 font-body-sm text-body-sm text-secondary">{{ field.help_text }}</p>{% endif %}
+                {% if field.errors %}
+                <div class="mt-1">
+                    {% for error in field.errors %}
+                    <p class="font-body-sm text-body-sm text-error flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">error</span>
+                        {{ error }}
+                    </p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="flex justify-end mt-6 pt-4 border-t border-border-low-contrast">
+            <button type="submit"
+                    class="bg-primary text-on-primary px-6 py-2.5 rounded-xl font-label-md text-label-md inline-flex items-center gap-2 shadow-sm hover:opacity-90 transition-opacity active:scale-95">
+                <span class="material-symbols-outlined text-[20px]">cloud_upload</span>
+                Upload Document
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Existing Documents -->
+<div class="space-y-stack-md animate-in animate-in-delay-2">
+    <div class="flex items-center justify-between">
+        <h3 class="font-headline-sm text-headline-sm text-on-surface">Uploaded Documents</h3>
+        {% if documents %}
+        <span class="font-label-md text-label-md text-secondary">{{ documents|length }} document{{ documents|length|pluralize }}</span>
+        {% endif %}
+    </div>
+
+    {% if documents %}
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-surface-subtle border-b border-border-low-contrast">
+                    <tr>
+                        <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Type</th>
+                        <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Document Name</th>
+                        <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Uploaded</th>
+                        <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Verification</th>
+                        <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Expiry Date</th>
+                        <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase text-right">Download</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-border-low-contrast">
+                    {% for doc in documents %}
+                    <tr class="hover:bg-primary/5 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary text-[20px]">description</span>
+                                <span class="font-data-tabular text-data-tabular text-on-surface">{{ doc.get_document_type_display }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 font-body-md text-body-md text-on-surface">{{ doc.document_name }}</td>
+                        <td class="px-6 py-4 font-body-sm text-body-sm text-secondary">{{ doc.uploaded_at|date:"M d, Y" }}</td>
+                        <td class="px-6 py-4">
+                            {% if doc.is_verified %}
+                            <div class="flex items-center gap-2">
+                                <span class="inline-flex items-center gap-1 text-status-approved font-label-md text-[11px] bg-status-approved/10 px-2.5 py-1 rounded-full">
+                                    <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+                                    Verified
+                                </span>
+                                {% if doc.verified_by %}
+                                <span class="font-body-sm text-body-sm text-secondary">by {{ doc.verified_by.get_full_name|default:doc.verified_by.username }}</span>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <span class="status-badge status-pending">
+                                <span class="material-symbols-outlined text-[14px]">schedule</span>
+                                Pending
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if doc.expiry_date %}
+                            <div class="flex items-center gap-2">
+                                <span class="font-body-sm text-body-sm {% if doc.is_expired %}text-error font-semibold{% else %}text-secondary{% endif %}">
+                                    {{ doc.expiry_date|date:"M d, Y" }}
+                                </span>
+                                {% if doc.is_expired %}
+                                <span class="inline-flex items-center gap-1 text-error font-label-md text-[11px] bg-error-container px-2 py-0.5 rounded-full">
+                                    <span class="material-symbols-outlined text-[14px]">warning</span>
+                                    Expired
+                                </span>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <span class="font-body-sm text-body-sm text-secondary">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            {% if doc.file %}
+                            <a href="{{ doc.file.url }}" target="_blank" download
+                               class="text-primary font-label-md text-label-md px-3 py-1.5 rounded-lg border border-primary/20 hover:bg-primary hover:text-on-primary transition-all inline-flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[18px]">download</span>
+                                Download
+                            </a>
+                            {% else %}
+                            <span class="font-body-sm text-body-sm text-secondary">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-16 text-center">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-surface-container-low flex items-center justify-center">
+            <span class="material-symbols-outlined text-[32px] text-secondary">folder_off</span>
+        </div>
+        <h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">No Documents Uploaded</h3>
+        <p class="font-body-md text-body-md text-secondary max-w-md mx-auto">
+            You haven't uploaded any documents yet. Use the form above to upload certificates, licenses, and other required documents.
+        </p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Apply form-input class to all Django-generated form widgets
+    document.addEventListener('DOMContentLoaded', function () {
+        const formFields = document.querySelectorAll('form input:not([type="file"]):not([type="checkbox"]):not([type="hidden"]), form select, form textarea');
+        formFields.forEach(function (el) {
+            if (!el.classList.contains('form-input')) {
+                el.classList.add('form-input');
+            }
+        });
+    });
+</script>
+{% endblock %}
+
+{% endwith %}

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}{% if action == 'approve' %}Approve{% else %}Reject{% endif %} Quotation — Procurement — VendorBridge{% endblock %}
+{% block page_title %}Confirm Action{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    {% if action == 'approve' %}
+    <div class="bg-status-approved/10 border border-status-approved rounded-xl p-6 mb-6">
+        <p class="font-headline-sm text-status-approved mb-2">✓ Approve Quotation</p>
+        <p class="text-body-sm text-on-surface">This will create a Purchase Order automatically with the quoted items and pricing.</p>
+    </div>
+    {% else %}
+    <div class="bg-status-rejected/10 border border-status-rejected rounded-xl p-6 mb-6">
+        <p class="font-headline-sm text-status-rejected mb-2">✗ Reject Quotation</p>
+        <p class="text-body-sm text-on-surface">The vendor will be notified that their quotation was not accepted.</p>
+    </div>
+    {% endif %}
+
+    <!-- Quotation Summary -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5 mb-6">
+        <h3 class="font-headline-sm mb-4">Quotation Summary</h3>
+        
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+                <p class="text-secondary text-label-md">Quotation</p>
+                <p class="font-label-md">{{ quotation.quotation_number }}</p>
+            </div>
+            <div>
+                <p class="text-secondary text-label-md">Vendor</p>
+                <p class="font-label-md">{{ quotation.vendor.company_name }}</p>
+            </div>
+            <div>
+                <p class="text-secondary text-label-md">RFQ</p>
+                <p class="font-label-md">{{ quotation.rfq.rfq_number }}: {{ quotation.rfq.title|truncatewords:5 }}</p>
+            </div>
+        </div>
+
+        <!-- Items Table -->
+        <table class="w-full text-sm mb-4">
+            <thead class="bg-surface-container border-b border-border-low-contrast">
+                <tr>
+                    <th class="px-3 py-2 text-left">Item</th>
+                    <th class="px-3 py-2 text-right">Qty</th>
+                    <th class="px-3 py-2 text-right">Unit Price</th>
+                    <th class="px-3 py-2 text-right">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in quotation.quotation_items.all %}
+                <tr class="border-b border-border-low-contrast">
+                    <td class="px-3 py-2">{{ item.rfq_item.description|truncatewords:6 }}</td>
+                    <td class="px-3 py-2 text-right">{{ item.rfq_item.quantity }}</td>
+                    <td class="px-3 py-2 text-right">₹{{ item.unit_price|floatformat:2 }}</td>
+                    <td class="px-3 py-2 text-right">₹{{ item.total_price|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Totals -->
+        <div class="space-y-2 border-t border-border-low-contrast pt-3">
+            <div class="flex justify-between">
+                <span>Subtotal</span>
+                <span>₹{{ quotation.total_amount|floatformat:2 }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Tax (18%)</span>
+                <span>₹{{ quotation.tax_amount|floatformat:2 }}</span>
+            </div>
+            <div class="flex justify-between font-headline-sm border-t border-border-low-contrast pt-2">
+                <span>Grand Total</span>
+                <span>₹{{ quotation.grand_total|floatformat:2 }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Form -->
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+
+        {% if action == 'reject' %}
+        <div>
+            <label class="block text-label-md font-label-md mb-2">Reason for Rejection (optional)</label>
+            <textarea name="rejection_reason" class="w-full px-3 py-2 border border-border-low-contrast rounded" placeholder="Provide feedback to the vendor..." rows="4"></textarea>
+        </div>
+        {% endif %}
+
+        <div class="flex gap-3 justify-end">
+            <a href="{% url 'proc_quotation_detail' quotation.id %}" class="px-6 py-2.5 border border-border-low-contrast rounded-xl font-label-md hover:bg-surface-container">Cancel</a>
+            {% if action == 'approve' %}
+            <button type="submit" class="px-6 py-2.5 bg-status-approved text-on-surface rounded-xl font-label-md hover:opacity-90">
+                ✓ Confirm Approval
+            </button>
+            {% else %}
+            <button type="submit" class="px-6 py-2.5 bg-status-rejected text-on-surface rounded-xl font-label-md hover:opacity-90">
+                ✗ Confirm Rejection
+            </button>
+            {% endif %}
+        </div>
+    </form>
+</div>
+{% endblock %}

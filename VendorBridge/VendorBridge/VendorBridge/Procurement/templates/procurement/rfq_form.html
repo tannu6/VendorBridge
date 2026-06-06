@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+{% block title %}{% if form.instance.id %}Edit{% else %}Create{% endif %} RFQ — Procurement — VendorBridge{% endblock %}
+{% block page_title %}{% if form.instance.id %}Edit{% else %}Create New{% endif %} RFQ{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-stack-lg">
+    <form method="post" enctype="multipart/form-data" class="space-y-gutter">
+        {% csrf_token %}
+
+        <!-- Basic Information -->
+        <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+            <h3 class="font-headline-sm mb-4">Basic Information</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-label-md font-label-md mb-2">Title</label>
+                    {{ form.title }}
+                    {% if form.title.errors %}<span class="text-status-rejected text-label-md">{{ form.title.errors.0 }}</span>{% endif %}
+                </div>
+
+                <div>
+                    <label class="block text-label-md font-label-md mb-2">Description</label>
+                    {{ form.description }}
+                    {% if form.description.errors %}<span class="text-status-rejected text-label-md">{{ form.description.errors.0 }}</span>{% endif %}
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-label-md font-label-md mb-2">Category</label>
+                        {{ form.category }}
+                        {% if form.category.errors %}<span class="text-status-rejected text-label-md">{{ form.category.errors.0 }}</span>{% endif %}
+                    </div>
+                    <div>
+                        <label class="block text-label-md font-label-md mb-2">Priority</label>
+                        {{ form.priority }}
+                        {% if form.priority.errors %}<span class="text-status-rejected text-label-md">{{ form.priority.errors.0 }}</span>{% endif %}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-label-md font-label-md mb-2">Submission Deadline</label>
+                        {{ form.submission_deadline }}
+                        {% if form.submission_deadline.errors %}<span class="text-status-rejected text-label-md">{{ form.submission_deadline.errors.0 }}</span>{% endif %}
+                    </div>
+                    <div>
+                        <label class="block text-label-md font-label-md mb-2">Delivery Deadline</label>
+                        {{ form.delivery_deadline }}
+                        {% if form.delivery_deadline.errors %}<span class="text-status-rejected text-label-md">{{ form.delivery_deadline.errors.0 }}</span>{% endif %}
+                    </div>
+                    <div>
+                        <label class="block text-label-md font-label-md mb-2">Estimated Budget</label>
+                        {{ form.estimated_budget }}
+                        {% if form.estimated_budget.errors %}<span class="text-status-rejected text-label-md">{{ form.estimated_budget.errors.0 }}</span>{% endif %}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-label-md font-label-md mb-2">Currency</label>
+                        {{ form.currency }}
+                        {% if form.currency.errors %}<span class="text-status-rejected text-label-md">{{ form.currency.errors.0 }}</span>{% endif %}
+                    </div>
+                    <div class="flex items-center pt-8">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            {{ form.show_budget_to_vendors }}
+                            <span class="text-label-md font-label-md">Show budget to vendors</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Terms & Conditions -->
+        <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+            <h3 class="font-headline-sm mb-4">Terms & Location</h3>
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-label-md font-label-md mb-2">Delivery Location</label>
+                        {{ form.delivery_location }}
+                    </div>
+                    <div>
+                        <label class="block text-label-md font-label-md mb-2">Payment Terms</label>
+                        {{ form.payment_terms }}
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-label-md font-label-md mb-2">Terms & Conditions</label>
+                    {{ form.terms_and_conditions }}
+                </div>
+                <div>
+                    <label class="block text-label-md font-label-md mb-2">Attachment</label>
+                    {{ form.attachment }}
+                </div>
+            </div>
+        </div>
+
+        <!-- RFQ Items -->
+        <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-headline-sm">Items</h3>
+                <button type="button" id="add-item-btn" class="text-primary hover:underline text-label-md flex items-center gap-1">
+                    <span class="material-symbols-outlined text-lg">add</span> Add Item
+                </button>
+            </div>
+
+            <div id="items-container" class="space-y-3">
+                {{ rfq_items_formset.management_form }}
+                {% for form in rfq_items_formset %}
+                <div class="item-form bg-surface-container p-4 rounded border border-border-low-contrast relative">
+                    <button type="button" class="remove-item-btn absolute top-2 right-2 text-status-rejected hover:underline text-body-sm flex items-center gap-0.5">
+                        <span class="material-symbols-outlined text-sm">delete</span> Remove
+                    </button>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-label-md mb-1">Description</label>
+                            {{ form.description }}
+                        </div>
+                        <div>
+                            <label class="block text-label-md mb-1">Quantity</label>
+                            {{ form.quantity }}
+                        </div>
+                        <div>
+                            <label class="block text-label-md mb-1">Unit</label>
+                            {{ form.unit }}
+                        </div>
+                    </div>
+                    {% if rfq_items_formset.can_delete %}
+                        {{ form.DELETE.as_hidden }}
+                    {% endif %}
+                    {{ form.id.as_hidden }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-3 justify-end">
+            <a href="{% url 'proc_rfq_list' %}" class="px-6 py-2.5 border border-border-low-contrast rounded-xl font-label-md hover:bg-surface-container">Cancel</a>
+            <button type="submit" class="px-6 py-2.5 bg-primary text-on-primary rounded-xl font-label-md hover:opacity-90">Save RFQ</button>
+        </div>
+    </form>
+</div>
+
+<!-- Empty form template for JS -->
+<template id="empty-form-template">
+    <div class="item-form bg-surface-container p-4 rounded border border-border-low-contrast relative">
+        <button type="button" class="remove-item-btn absolute top-2 right-2 text-status-rejected hover:underline text-body-sm flex items-center gap-0.5">
+            <span class="material-symbols-outlined text-sm">delete</span> Remove
+        </button>
+        <div class="grid grid-cols-3 gap-3">
+            <div>
+                <label class="block text-label-md mb-1">Description</label>
+                {{ rfq_items_formset.empty_form.description }}
+            </div>
+            <div>
+                <label class="block text-label-md mb-1">Quantity</label>
+                {{ rfq_items_formset.empty_form.quantity }}
+            </div>
+            <div>
+                <label class="block text-label-md mb-1">Unit</label>
+                {{ rfq_items_formset.empty_form.unit }}
+            </div>
+        </div>
+        {% if rfq_items_formset.can_delete %}
+            {{ rfq_items_formset.empty_form.DELETE.as_hidden }}
+        {% endif %}
+        {{ rfq_items_formset.empty_form.id.as_hidden }}
+    </div>
+</template>
+
+<style>
+    form input[type="text"],
+    form input[type="datetime-local"],
+    form input[type="date"],
+    form input[type="number"],
+    form select,
+    form textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--border-low-contrast);
+        border-radius: 0.5rem;
+        font-family: inherit;
+        font-size: 0.875rem;
+    }
+    form textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+    form input[type="checkbox"] {
+        width: 1.25rem;
+        height: 1.25rem;
+        border-radius: 0.25rem;
+        border: 1px solid var(--border-low-contrast);
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const container = document.getElementById("items-container");
+        const addButton = document.getElementById("add-item-btn");
+        const totalFormsInput = document.getElementById("id_items-TOTAL_FORMS");
+        const emptyTemplate = document.getElementById("empty-form-template");
+
+        if (addButton && container && totalFormsInput && emptyTemplate) {
+            addButton.addEventListener("click", function() {
+                const formCount = parseInt(totalFormsInput.value);
+                const templateHtml = emptyTemplate.innerHTML;
+                const newFormHtml = templateHtml.replace(/__prefix__/g, formCount);
+                
+                // Create a temporary element to hold the new form
+                const tempDiv = document.createElement("div");
+                tempDiv.innerHTML = newFormHtml.trim();
+                const newFormNode = tempDiv.firstChild;
+                
+                // Add remove event listener
+                const removeBtn = newFormNode.querySelector(".remove-item-btn");
+                if (removeBtn) {
+                    removeBtn.addEventListener("click", function() {
+                        newFormNode.remove();
+                        reindexForms();
+                    });
+                }
+                
+                container.appendChild(newFormNode);
+                totalFormsInput.value = formCount + 1;
+            });
+        }
+
+        // Add event listeners to existing remove buttons
+        container.addEventListener("click", function(e) {
+            if (e.target.closest(".remove-item-btn")) {
+                const btn = e.target.closest(".remove-item-btn");
+                const itemForm = btn.closest(".item-form");
+                // Check if it's an existing form (has an ID value)
+                const idInput = itemForm.querySelector("input[name$='-id']");
+                const deleteCheckbox = itemForm.querySelector("input[name$='-DELETE']");
+                
+                if (idInput && idInput.value) {
+                    // It's an existing form, mark it for deletion
+                    if (deleteCheckbox) {
+                        deleteCheckbox.checked = true;
+                        itemForm.style.display = "none";
+                    }
+                } else {
+                    // It's a new form, just remove it and re-index
+                    itemForm.remove();
+                    reindexForms();
+                }
+            }
+        });
+
+        function reindexForms() {
+            const forms = container.querySelectorAll(".item-form:not([style*='display: none'])");
+            // Set TOTAL_FORMS to the total number of forms currently present (both visible and hidden/deleted)
+            const allForms = container.querySelectorAll(".item-form");
+            totalFormsInput.value = allForms.length;
+            
+            allForms.forEach((form, index) => {
+                // Update names and ids for all inputs/selects/textareas
+                form.querySelectorAll("input, select, textarea").forEach(input => {
+                    if (input.name) {
+                        input.name = input.name.replace(/items-\d+-/, `items-${index}-`);
+                    }
+                    if (input.id) {
+                        input.id = input.id.replace(/id_items-\d+-/, `id_items-${index}-`);
+                    }
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

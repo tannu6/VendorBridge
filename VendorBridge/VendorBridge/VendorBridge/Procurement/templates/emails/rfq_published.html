@@ -1,0 +1,47 @@
+<html>
+<body style="font-family: Arial, sans-serif; color: #333;">
+<table width="100%" style="max-width: 600px; margin: 0 auto; border-collapse: collapse;">
+<tr>
+    <td style="padding: 20px; background-color: #f5f5f5; text-align: center;">
+        <h1 style="color: #2563eb; margin: 0;">VendorBridge</h1>
+    </td>
+</tr>
+<tr>
+    <td style="padding: 20px;">
+        <h2>New RFQ Available</h2>
+        <p>Dear {{ vendor.company_name }},</p>
+        
+        <p>A new Request for Quotation (RFQ) is now available for your review and response.</p>
+        
+        <table style="width: 100%; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 4px; margin: 15px 0;">
+            <tr>
+                <td style="padding: 10px; font-weight: bold;">RFQ Number:</td>
+                <td style="padding: 10px;">{{ rfq.rfq_number }}</td>
+            </tr>
+            <tr style="background-color: #f0f0f0;">
+                <td style="padding: 10px; font-weight: bold;">Title:</td>
+                <td style="padding: 10px;">{{ rfq.title }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; font-weight: bold;">Submission Deadline:</td>
+                <td style="padding: 10px;">{{ submission_deadline|date:"M d, Y H:i" }}</td>
+            </tr>
+        </table>
+        
+        <p>{{ rfq.description|linebreaks }}</p>
+        
+        <p><a href="{{ view_url }}" style="display: inline-block; background-color: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">View RFQ Details</a></p>
+        
+        <p>Please review the RFQ and submit your quotation before the submission deadline.</p>
+        
+        <p>Best regards,<br>VendorBridge Team</p>
+    </td>
+</tr>
+<tr>
+    <td style="padding: 15px; background-color: #f5f5f5; text-align: center; color: #666; font-size: 12px;">
+        <p>© 2024 VendorBridge. All rights reserved.</p>
+    </td>
+</tr>
+</table>
+</body>
+</html>

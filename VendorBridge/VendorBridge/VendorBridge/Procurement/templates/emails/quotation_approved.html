@@ -1,0 +1,45 @@
+<html>
+<body style="font-family: Arial, sans-serif; color: #333;">
+<table width="100%" style="max-width: 600px; margin: 0 auto; border-collapse: collapse;">
+<tr>
+    <td style="padding: 20px; background-color: #f5f5f5; text-align: center;">
+        <h1 style="color: #2563eb; margin: 0;">VendorBridge</h1>
+    </td>
+</tr>
+<tr>
+    <td style="padding: 20px;">
+        <h2 style="color: #10b981;">✓ Quotation Approved</h2>
+        <p>Dear {{ vendor.company_name }},</p>
+        
+        <p>Great news! Your quotation has been approved and a Purchase Order (PO) has been issued.</p>
+        
+        <table style="width: 100%; background-color: #f0fdf4; border: 2px solid #10b981; border-radius: 4px; margin: 15px 0;">
+            <tr>
+                <td style="padding: 10px; font-weight: bold; color: #10b981;">Quotation Number:</td>
+                <td style="padding: 10px;">{{ quotation.quotation_number }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; font-weight: bold; color: #10b981;">Purchase Order:</td>
+                <td style="padding: 10px; font-weight: bold;">{{ purchase_order.po_number }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; font-weight: bold; color: #10b981;">Total Amount:</td>
+                <td style="padding: 10px; font-weight: bold;">₹{{ purchase_order.grand_total|floatformat:2 }}</td>
+            </tr>
+        </table>
+        
+        <p><a href="{{ po_url }}" style="display: inline-block; background-color: #10b981; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">View Purchase Order</a></p>
+        
+        <p>Please proceed with fulfillment according to the PO terms and delivery specifications.</p>
+        
+        <p>Best regards,<br>VendorBridge Team</p>
+    </td>
+</tr>
+<tr>
+    <td style="padding: 15px; background-color: #f5f5f5; text-align: center; color: #666; font-size: 12px;">
+        <p>© 2024 VendorBridge. All rights reserved.</p>
+    </td>
+</tr>
+</table>
+</body>
+</html>

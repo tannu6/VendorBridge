@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Vendor Management — Procurement — VendorBridge{% endblock %}
+{% block page_title %}Vendor Management{% endblock %}
+
+{% block content %}
+<div class="space-y-stack-lg">
+    <h2 class="font-headline-md text-headline-md">Vendors</h2>
+
+    <!-- Filters -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <form method="get" class="flex gap-4 flex-wrap">
+            <input type="text" name="search" placeholder="Search vendors..." value="{{ request.GET.search }}" class="px-3 py-2 rounded border border-border-low-contrast flex-1 min-w-48">
+            <select name="status" class="px-3 py-2 rounded border border-border-low-contrast">
+                <option value="">All Statuses</option>
+                <option value="APPROVED" {% if request.GET.status == 'APPROVED' %}selected{% endif %}>Approved</option>
+                <option value="PENDING" {% if request.GET.status == 'PENDING' %}selected{% endif %}>Pending</option>
+                <option value="REJECTED" {% if request.GET.status == 'REJECTED' %}selected{% endif %}>Rejected</option>
+            </select>
+            <button type="submit" class="bg-primary text-on-primary px-6 py-2.5 rounded-xl font-label-md">Filter</button>
+        </form>
+    </div>
+
+    <!-- Vendors Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+        {% for vendor in vendors %}
+        <a href="{% url 'proc_vendor_detail' vendor.id %}" class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5 hover:border-primary transition">
+            <div class="flex justify-between items-start mb-3">
+                <div>
+                    <p class="font-headline-sm">{{ vendor.company_name }}</p>
+                    <p class="text-body-sm text-secondary">{{ vendor.company_type }}</p>
+                </div>
+                <span class="status-badge status-{{ vendor.status }}">{{ vendor.get_status_display }}</span>
+            </div>
+
+            <div class="space-y-2 text-body-sm">
+                <p class="text-secondary">📧 {{ vendor.contact_email }}</p>
+                <p class="text-secondary">📞 {{ vendor.contact_phone }}</p>
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-border-low-contrast">
+                <div class="flex justify-between items-center">
+                    <span class="text-secondary text-label-md">Rating</span>
+                    <span class="font-label-md">{{ vendor.rating|default:"N/A" }}/5</span>
+                </div>
+            </div>
+
+            <p class="text-primary mt-3 font-label-md hover:underline">View Profile →</p>
+        </a>
+        {% empty %}
+        <div class="col-span-full text-center py-8">
+            <p class="text-secondary">No vendors found</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

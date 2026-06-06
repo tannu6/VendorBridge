@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% with active_page="orders" %}
+
+{% block title %}{{ order.po_number }} – VendorBridge{% endblock %}
+{% block page_title %}Order Detail{% endblock %}
+
+{% block content %}
+<!-- Back Link -->
+<div class="animate-in">
+    <a href="{% url 'order_list' %}" class="inline-flex items-center gap-2 text-primary hover:underline font-label-md text-label-md group">
+        <span class="material-symbols-outlined text-[18px] group-hover:-translate-x-0.5 transition-transform">arrow_back</span>
+        Back to Orders
+    </a>
+</div>
+
+<!-- Header -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-in animate-in-delay-1">
+    <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-primary-fixed flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary text-headline-sm" style="font-variation-settings: 'FILL' 1;">shopping_cart</span>
+        </div>
+        <div>
+            <h2 class="font-headline-md text-headline-md text-on-surface">{{ order.po_number }}</h2>
+            <p class="font-body-sm text-body-sm text-secondary mt-0.5">Purchase Order</p>
+        </div>
+    </div>
+    <div class="flex items-center gap-3">
+        <span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+        {% if order.is_overdue %}
+        <span class="status-badge status-overdue">
+            <span class="material-symbols-outlined text-[14px]">warning</span>
+            Overdue
+        </span>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Info Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter animate-in animate-in-delay-2">
+    <!-- RFQ -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <p class="font-label-md text-label-md text-secondary uppercase mb-1">RFQ</p>
+        {% if order.rfq %}
+        <a href="{% url 'rfq_detail' order.rfq.id %}" class="font-data-tabular text-data-tabular text-primary hover:underline">{{ order.rfq.rfq_number }}</a>
+        {% else %}
+        <p class="font-data-tabular text-data-tabular text-on-surface">—</p>
+        {% endif %}
+    </div>
+
+    <!-- Grand Total -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <p class="font-label-md text-label-md text-secondary uppercase mb-1">Grand Total</p>
+        <p class="font-headline-sm text-headline-sm text-on-surface">{{ order.currency }} {{ order.grand_total|floatformat:2 }}</p>
+    </div>
+
+    <!-- Issue Date -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <p class="font-label-md text-label-md text-secondary uppercase mb-1">Issue Date</p>
+        <p class="font-data-tabular text-data-tabular text-on-surface">
+            {% if order.issue_date %}{{ order.issue_date|date:"M d, Y" }}{% else %}—{% endif %}
+        </p>
+    </div>
+
+    <!-- Expected Delivery -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <p class="font-label-md text-label-md text-secondary uppercase mb-1">Expected Delivery</p>
+        <p class="font-data-tabular text-data-tabular {% if order.is_overdue %}text-error{% else %}text-on-surface{% endif %}">
+            {% if order.expected_delivery_date %}
+                {{ order.expected_delivery_date|date:"M d, Y" }}
+                {% if order.is_overdue %}
+                <span class="material-symbols-outlined text-[16px] ml-1 align-middle">warning</span>
+                {% endif %}
+            {% else %}—{% endif %}
+        </p>
+    </div>
+
+    <!-- Actual Delivery -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <p class="font-label-md text-label-md text-secondary uppercase mb-1">Actual Delivery</p>
+        <p class="font-data-tabular text-data-tabular text-on-surface">
+            {% if order.actual_delivery_date %}{{ order.actual_delivery_date|date:"M d, Y" }}{% else %}—{% endif %}
+        </p>
+    </div>
+
+    <!-- Payment Terms -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <p class="font-label-md text-label-md text-secondary uppercase mb-1">Payment Terms</p>
+        <p class="font-data-tabular text-data-tabular text-on-surface">{{ order.payment_terms|default:"—" }}</p>
+    </div>
+
+    <!-- Delivery Address -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5 md:col-span-2 lg:col-span-3">
+        <p class="font-label-md text-label-md text-secondary uppercase mb-1">Delivery Address</p>
+        <p class="font-body-md text-body-md text-on-surface">{{ order.delivery_address|default:"—"|linebreaksbr }}</p>
+    </div>
+</div>
+
+<!-- Special Instructions -->
+{% if order.special_instructions %}
+<div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-6 animate-in animate-in-delay-3">
+    <div class="flex items-center gap-2 mb-3">
+        <span class="material-symbols-outlined text-status-pending text-[20px]">info</span>
+        <h3 class="font-headline-sm text-headline-sm text-on-surface">Special Instructions</h3>
+    </div>
+    <p class="font-body-md text-body-md text-on-surface-variant">{{ order.special_instructions|linebreaksbr }}</p>
+</div>
+{% endif %}
+
+<!-- Items Table -->
+<div class="space-y-stack-md animate-in animate-in-delay-3">
+    <h3 class="font-headline-sm text-headline-sm text-on-surface">Order Items</h3>
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-surface-subtle border-b border-border-low-contrast">
+                    <tr>
+                        <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Item Name</th>
+                        <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase text-right">Quantity</th>
+                        <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Unit</th>
+                        <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase text-right">Unit Price</th>
+                        <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase text-right">Total</th>
+                        <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase text-right">Qty Delivered</th>
+                        <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase text-right">Qty Pending</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-border-low-contrast">
+                    {% for item in order.items.all %}
+                    <tr class="hover:bg-primary/5 transition-colors">
+                        <td class="px-6 py-4 font-data-tabular text-data-tabular text-on-surface">{{ item.item_name }}</td>
+                        <td class="px-6 py-4 font-data-tabular text-data-tabular text-right">{{ item.quantity|floatformat:2 }}</td>
+                        <td class="px-6 py-4 font-body-sm text-body-sm text-secondary">{{ item.unit }}</td>
+                        <td class="px-6 py-4 font-data-tabular text-data-tabular text-right">₹{{ item.unit_price|floatformat:2 }}</td>
+                        <td class="px-6 py-4 font-data-tabular text-data-tabular text-right font-semibold">₹{{ item.total_price|floatformat:2 }}</td>
+                        <td class="px-6 py-4 font-data-tabular text-data-tabular text-right">
+                            <span class="{% if item.quantity_delivered > 0 %}text-status-approved{% else %}text-secondary{% endif %}">
+                                {{ item.quantity_delivered|floatformat:2 }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 font-data-tabular text-data-tabular text-right">
+                            <span class="{% if item.quantity_pending > 0 %}text-status-pending{% else %}text-status-approved{% endif %}">
+                                {{ item.quantity_pending|floatformat:2 }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-6 py-8 text-center text-secondary font-body-md">No items found in this order.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="bg-surface-subtle border-t border-border-low-contrast">
+                    <tr>
+                        <td colspan="4" class="px-6 py-4 font-label-md text-label-md text-secondary uppercase text-right">Grand Total</td>
+                        <td class="px-6 py-4 font-headline-sm text-headline-sm text-on-surface text-right">₹{{ order.grand_total|floatformat:2 }}</td>
+                        <td colspan="2"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Actions -->
+<div class="flex flex-wrap items-center gap-3 animate-in animate-in-delay-4">
+    {% if order.status == 'issued' %}
+    <a href="{% url 'acknowledge_order' order.id %}"
+       class="bg-primary text-on-primary px-6 py-2.5 rounded-xl font-label-md text-label-md inline-flex items-center gap-2 shadow-sm hover:opacity-90 transition-opacity active:scale-95">
+        <span class="material-symbols-outlined text-[20px]">check_circle</span>
+        Acknowledge Order
+    </a>
+    {% endif %}
+
+    <a href="{% url 'invoice_create' order.id %}"
+       class="bg-surface-container-lowest border border-border-low-contrast text-on-surface px-6 py-2.5 rounded-xl font-label-md text-label-md inline-flex items-center gap-2 hover:bg-surface-container-low transition-colors active:scale-95">
+        <span class="material-symbols-outlined text-[20px]">receipt_long</span>
+        Create Invoice
+    </a>
+</div>
+{% endblock %}
+
+{% endwith %}

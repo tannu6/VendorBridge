@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+{% with active_page="dashboard" %}
+
+{% block title %}Dashboard — VendorBridge{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Welcome Section -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-stack-lg items-end animate-in">
+    <div class="lg:col-span-8 space-y-2">
+        <div class="flex items-center gap-3 flex-wrap">
+            <h2 class="font-headline-md text-headline-md text-on-surface">Welcome back, {{ user.first_name }}!</h2>
+            {% if vendor.status %}
+            <span class="status-badge status-{{ vendor.status }}">{{ vendor.get_status_display }}</span>
+            {% endif %}
+        </div>
+        <p class="font-body-md text-body-md text-secondary">Here's an overview of your vendor portal activity.</p>
+    </div>
+    <div class="lg:col-span-4 flex justify-end gap-3">
+        <a href="{% url 'rfq_list' %}" class="bg-primary text-on-primary px-6 py-2.5 rounded-xl font-label-md text-label-md flex items-center gap-2 shadow-sm hover:opacity-90 transition-opacity active:scale-95">
+            <span class="material-symbols-outlined text-[20px]">request_quote</span>
+            Browse RFQs
+        </a>
+        {% if user.is_staff %}
+        <a href="/admin/" class="bg-primary-container text-on-primary px-6 py-2.5 rounded-xl font-label-md text-label-md flex items-center gap-2 shadow-sm hover:opacity-90 transition-opacity active:scale-95">
+            <span class="material-symbols-outlined text-[20px]">admin_panel_settings</span>
+            Admin Panel
+        </a>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Status Banners -->
+{% if vendor.status == 'pending' %}
+<div class="p-4 rounded-xl bg-status-pending/10 border border-status-pending/20 flex items-center gap-3 animate-in">
+    <div class="w-10 h-10 bg-status-pending/20 rounded-lg flex items-center justify-center flex-shrink-0">
+        <span class="material-symbols-outlined text-status-pending">hourglass_top</span>
+    </div>
+    <div>
+        <p class="font-data-tabular text-data-tabular text-on-surface">Your account is pending approval</p>
+        <p class="font-body-sm text-body-sm text-secondary mt-0.5">An administrator will review your registration shortly. You'll be notified once your account is approved.</p>
+    </div>
+</div>
+{% endif %}
+
+{% if vendor.status == 'rejected' %}
+<div class="p-4 rounded-xl bg-error-container border border-error/20 flex items-center gap-3 animate-in">
+    <div class="w-10 h-10 bg-error/10 rounded-lg flex items-center justify-center flex-shrink-0">
+        <span class="material-symbols-outlined text-error">block</span>
+    </div>
+    <div>
+        <p class="font-data-tabular text-data-tabular text-on-error-container">Your account has been rejected</p>
+        {% if vendor.rejection_reason %}
+        <p class="font-body-sm text-body-sm text-on-error-container/80 mt-0.5">Reason: {{ vendor.rejection_reason }}</p>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Stats Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+    <!-- Open RFQs -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5 hover:border-primary-container transition-all animate-in animate-in-delay-1">
+        <div class="flex justify-between items-start mb-4">
+            <div class="p-2 bg-primary-fixed text-primary rounded-lg">
+                <span class="material-symbols-outlined">request_quote</span>
+            </div>
+        </div>
+        <p class="text-secondary font-label-md text-label-md">Open RFQs</p>
+        <p class="font-display-lg text-display-lg text-on-surface mt-1">{{ open_rfqs_count|default:"0" }}</p>
+    </div>
+
+    <!-- My Quotations -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5 hover:border-primary-container transition-all animate-in animate-in-delay-2">
+        <div class="flex justify-between items-start mb-4">
+            <div class="p-2 bg-status-info/10 text-status-info rounded-lg">
+                <span class="material-symbols-outlined">description</span>
+            </div>
+        </div>
+        <p class="text-secondary font-label-md text-label-md">My Quotations</p>
+        <p class="font-display-lg text-display-lg text-on-surface mt-1">{{ my_quotations_count|default:"0" }}</p>
+    </div>
+
+    <!-- Active Orders -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5 hover:border-primary-container transition-all animate-in animate-in-delay-3">
+        <div class="flex justify-between items-start mb-4">
+            <div class="p-2 bg-status-approved/10 text-status-approved rounded-lg">
+                <span class="material-symbols-outlined">shopping_cart</span>
+            </div>
+        </div>
+        <p class="text-secondary font-label-md text-label-md">Active Orders</p>
+        <p class="font-display-lg text-display-lg text-on-surface mt-1">{{ active_orders_count|default:"0" }}</p>
+    </div>
+
+    <!-- Pending Invoices -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5 hover:border-primary-container transition-all animate-in animate-in-delay-4">
+        <div class="flex justify-between items-start mb-4">
+            <div class="p-2 bg-status-pending/10 text-status-pending rounded-lg">
+                <span class="material-symbols-outlined">receipt_long</span>
+            </div>
+        </div>
+        <p class="text-secondary font-label-md text-label-md">Pending Invoices</p>
+        <p class="font-display-lg text-display-lg text-on-surface mt-1">{{ pending_invoices_count|default:"0" }}</p>
+    </div>
+</section>
+
+<!-- Main Content Grid -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-stack-lg">
+    <!-- Recent Open RFQs Table -->
+    <section class="xl:col-span-8 space-y-stack-md">
+        <div class="flex items-center justify-between">
+            <h3 class="font-headline-sm text-headline-sm text-on-surface">Recent Open RFQs</h3>
+            <a href="{% url 'rfq_list' %}" class="text-primary font-label-md text-label-md hover:underline">View All</a>
+        </div>
+
+        {% if recent_rfqs %}
+        <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl overflow-hidden shadow-sm animate-in">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-surface-subtle border-b border-border-low-contrast">
+                        <tr>
+                            <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">RFQ Number</th>
+                            <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Title</th>
+                            <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Deadline</th>
+                            <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Priority</th>
+                            <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-border-low-contrast">
+                        {% for rfq in recent_rfqs %}
+                        <tr class="hover:bg-primary/5 transition-colors">
+                            <td class="px-6 py-4 font-data-tabular text-data-tabular">{{ rfq.rfq_number }}</td>
+                            <td class="px-6 py-4">
+                                <p class="font-body-md text-body-md text-on-surface truncate max-w-[200px]">{{ rfq.title }}</p>
+                            </td>
+                            <td class="px-6 py-4 font-body-sm text-body-sm text-secondary">{{ rfq.submission_deadline|date:"M d, Y" }}</td>
+                            <td class="px-6 py-4">
+                                <span class="status-badge status-{{ rfq.priority }}">{{ rfq.get_priority_display }}</span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <a href="{% url 'rfq_detail' rfq.id %}" class="text-primary font-label-md text-label-md px-3 py-1.5 rounded-lg border border-primary/20 hover:bg-primary hover:text-white transition-all inline-flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[16px]">visibility</span>
+                                    View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <!-- Empty State -->
+        <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-12 text-center animate-in">
+            <div class="w-16 h-16 bg-surface-container-low rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="material-symbols-outlined text-outline text-[32px]">inbox</span>
+            </div>
+            <h4 class="font-headline-sm text-headline-sm text-on-surface mb-1">No open RFQs</h4>
+            <p class="font-body-sm text-body-sm text-secondary max-w-sm mx-auto">There are currently no open requests for quotation. Check back later for new opportunities.</p>
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- Right Sidebar -->
+    <aside class="xl:col-span-4 space-y-stack-lg">
+        <!-- Recent Activity -->
+        <div class="space-y-stack-md">
+            <h3 class="font-headline-sm text-headline-sm text-on-surface">Recent Activity</h3>
+            {% if recent_notifications %}
+            <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-6 space-y-6 relative overflow-hidden animate-in">
+                <div class="absolute left-[33px] top-6 bottom-6 w-px bg-border-low-contrast"></div>
+                {% for notif in recent_notifications %}
+                <div class="relative flex gap-4">
+                    <div class="w-4 h-4 rounded-full border-4 border-surface-container-lowest z-10 mt-1
+                        {% if notif.notification_type == 'rfq' %}bg-status-info
+                        {% elif notif.notification_type == 'quotation' %}bg-status-pending
+                        {% elif notif.notification_type == 'order' %}bg-status-approved
+                        {% elif notif.notification_type == 'invoice' %}bg-primary
+                        {% else %}bg-secondary{% endif %}">
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-body-md text-body-md text-on-surface">{{ notif.title }}</p>
+                        <p class="text-secondary text-body-sm line-clamp-2">{{ notif.message }}</p>
+                        <p class="text-[11px] text-secondary-fixed-dim uppercase mt-1">{{ notif.created_at|timesince }} ago</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-6 text-center animate-in">
+                <span class="material-symbols-outlined text-outline text-[28px] mb-2">notifications_off</span>
+                <p class="font-body-sm text-body-sm text-secondary">No recent activity</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="space-y-stack-md">
+            <h3 class="font-headline-sm text-headline-sm text-on-surface">Quick Actions</h3>
+            <div class="grid grid-cols-2 gap-3">
+                <a href="{% url 'rfq_list' %}" class="flex flex-col items-center justify-center p-4 bg-surface-container-low rounded-xl border border-border-low-contrast hover:bg-primary-fixed transition-colors group">
+                    <span class="material-symbols-outlined text-primary mb-2 group-hover:scale-110 transition-transform">request_quote</span>
+                    <span class="font-label-md text-label-md text-on-surface">Browse RFQs</span>
+                </a>
+                <a href="{% url 'quotation_list' %}" class="flex flex-col items-center justify-center p-4 bg-surface-container-low rounded-xl border border-border-low-contrast hover:bg-primary-fixed transition-colors group">
+                    <span class="material-symbols-outlined text-primary mb-2 group-hover:scale-110 transition-transform">description</span>
+                    <span class="font-label-md text-label-md text-on-surface">My Quotations</span>
+                </a>
+                <a href="{% url 'vendor_profile' %}" class="flex flex-col items-center justify-center p-4 bg-surface-container-low rounded-xl border border-border-low-contrast hover:bg-primary-fixed transition-colors group">
+                    <span class="material-symbols-outlined text-primary mb-2 group-hover:scale-110 transition-transform">business</span>
+                    <span class="font-label-md text-label-md text-on-surface">Company Profile</span>
+                </a>
+                <a href="{% url 'vendor_documents' %}" class="flex flex-col items-center justify-center p-4 bg-surface-container-low rounded-xl border border-border-low-contrast hover:bg-primary-fixed transition-colors group">
+                    <span class="material-symbols-outlined text-primary mb-2 group-hover:scale-110 transition-transform">upload_file</span>
+                    <span class="font-label-md text-label-md text-on-surface">Upload Documents</span>
+                </a>
+            </div>
+        </div>
+    </aside>
+</div>
+{% endblock %}
+
+{% endwith %}

@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% with active_page="quotations" %}
+
+{% block title %}{{ quotation.quotation_number }} — VendorBridge{% endblock %}
+{% block page_title %}Quotation Details{% endblock %}
+
+{% block content %}
+<!-- Back Link -->
+<a href="{% url 'quotation_list' %}" class="inline-flex items-center gap-1.5 text-primary font-label-md text-label-md hover:underline mb-2">
+    <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+    Back to My Quotations
+</a>
+
+<!-- Header Card -->
+<section class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-6 animate-in">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-primary-fixed rounded-xl flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-primary text-[24px]">description</span>
+            </div>
+            <div>
+                <h2 class="font-headline-md text-headline-md text-on-surface">{{ quotation.quotation_number }}</h2>
+                <p class="font-body-sm text-body-sm text-secondary mt-0.5">Submitted for {{ quotation.rfq.rfq_number }}</p>
+            </div>
+        </div>
+        <span class="status-badge status-{{ quotation.status }} self-start sm:self-auto py-2 px-4">{{ quotation.get_status_display }}</span>
+    </div>
+</section>
+
+<!-- Info Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter animate-in" style="animation-delay: 50ms;">
+    <!-- RFQ -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-[18px] text-outline">request_quote</span>
+            <p class="font-label-md text-label-md text-secondary uppercase">RFQ</p>
+        </div>
+        <a href="{% url 'rfq_detail' quotation.rfq.id %}" class="font-body-lg text-body-lg text-primary hover:underline">{{ quotation.rfq.rfq_number }}</a>
+        <p class="font-body-sm text-body-sm text-secondary mt-0.5">{{ quotation.rfq.title }}</p>
+    </div>
+
+    <!-- Grand Total -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-[18px] text-outline">payments</span>
+            <p class="font-label-md text-label-md text-secondary uppercase">Grand Total</p>
+        </div>
+        <p class="font-body-lg text-body-lg text-on-surface font-semibold">{{ quotation.grand_total }}</p>
+    </div>
+
+    <!-- Tax Amount -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-[18px] text-outline">receipt</span>
+            <p class="font-label-md text-label-md text-secondary uppercase">Tax Amount</p>
+        </div>
+        <p class="font-body-lg text-body-lg text-on-surface">{{ quotation.tax_amount|default:"—" }}</p>
+    </div>
+
+    <!-- Discount -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-[18px] text-outline">percent</span>
+            <p class="font-label-md text-label-md text-secondary uppercase">Discount %</p>
+        </div>
+        <p class="font-body-lg text-body-lg text-on-surface">{{ quotation.discount_percentage|default:"0" }}%</p>
+    </div>
+
+    <!-- Delivery Days -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-[18px] text-outline">local_shipping</span>
+            <p class="font-label-md text-label-md text-secondary uppercase">Delivery Days</p>
+        </div>
+        <p class="font-body-lg text-body-lg text-on-surface">{{ quotation.delivery_days|default:"—" }}</p>
+    </div>
+
+    <!-- Payment Terms -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-[18px] text-outline">account_balance_wallet</span>
+            <p class="font-label-md text-label-md text-secondary uppercase">Payment Terms</p>
+        </div>
+        <p class="font-body-lg text-body-lg text-on-surface">{{ quotation.payment_terms|default:"—" }}</p>
+    </div>
+
+    <!-- Warranty -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-[18px] text-outline">verified_user</span>
+            <p class="font-label-md text-label-md text-secondary uppercase">Warranty</p>
+        </div>
+        <p class="font-body-lg text-body-lg text-on-surface">{{ quotation.warranty_period|default:"—" }}</p>
+    </div>
+
+    <!-- Validity Period -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-[18px] text-outline">event_available</span>
+            <p class="font-label-md text-label-md text-secondary uppercase">Validity Period</p>
+        </div>
+        <p class="font-body-lg text-body-lg text-on-surface">{{ quotation.validity_period|default:"—" }}</p>
+    </div>
+
+    <!-- Submitted At -->
+    <div class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-5">
+        <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-[18px] text-outline">schedule</span>
+            <p class="font-label-md text-label-md text-secondary uppercase">Submitted At</p>
+        </div>
+        <p class="font-body-lg text-body-lg text-on-surface">{{ quotation.submitted_at|date:"M d, Y h:i A"|default:"—" }}</p>
+    </div>
+</section>
+
+<!-- Items Table -->
+<section class="bg-surface-container-lowest border border-border-low-contrast rounded-xl overflow-hidden animate-in" style="animation-delay: 100ms;">
+    <div class="p-6 pb-0">
+        <h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+            <span class="material-symbols-outlined text-[20px] text-primary">inventory_2</span>
+            Quoted Items
+        </h3>
+    </div>
+    <div class="overflow-x-auto mt-4">
+        <table class="w-full text-left border-collapse">
+            <thead class="bg-surface-subtle border-y border-border-low-contrast">
+                <tr>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">#</th>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Item Name</th>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Unit Price</th>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Quantity</th>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Total Price</th>
+                    <th class="px-6 py-4 font-label-md text-label-md text-secondary uppercase">Remarks</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-border-low-contrast">
+                {% for item in quotation.items.all %}
+                <tr class="hover:bg-primary/5 transition-colors">
+                    <td class="px-6 py-4 font-data-tabular text-data-tabular text-secondary">{{ forloop.counter }}</td>
+                    <td class="px-6 py-4 font-data-tabular text-data-tabular font-semibold">{{ item.item_name }}</td>
+                    <td class="px-6 py-4 font-data-tabular text-data-tabular">{{ item.unit_price }}</td>
+                    <td class="px-6 py-4 font-data-tabular text-data-tabular">{{ item.quantity }}</td>
+                    <td class="px-6 py-4 font-data-tabular text-data-tabular font-semibold">{{ item.total_price }}</td>
+                    <td class="px-6 py-4 font-body-sm text-body-sm text-secondary max-w-xs">{{ item.remarks|default:"—" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="px-6 py-8 text-center text-secondary font-body-md">No items in this quotation.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- Reviewer Notes -->
+{% if quotation.review_notes %}
+<section class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-6 animate-in" style="animation-delay: 150ms;">
+    <h3 class="font-headline-sm text-headline-sm text-on-surface mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-[20px] text-status-info">rate_review</span>
+        Reviewer Notes
+    </h3>
+    <div class="bg-status-info/5 border border-status-info/20 rounded-xl p-4">
+        <p class="font-body-md text-body-md text-on-surface leading-relaxed whitespace-pre-line">{{ quotation.review_notes }}</p>
+    </div>
+</section>
+{% endif %}
+
+<!-- Attachment -->
+{% if quotation.attachment %}
+<section class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-6 animate-in" style="animation-delay: 200ms;">
+    <h3 class="font-headline-sm text-headline-sm text-on-surface mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-[20px] text-primary">attach_file</span>
+        Attachment
+    </h3>
+    <a href="{{ quotation.attachment.url }}" download
+       class="inline-flex items-center gap-2 px-4 py-2.5 bg-surface-container-low border border-border-low-contrast rounded-xl hover:bg-primary-fixed transition-colors font-label-md text-label-md text-primary">
+        <span class="material-symbols-outlined text-[18px]">download</span>
+        Download Attachment
+    </a>
+</section>
+{% endif %}
+
+<!-- Vendor Notes -->
+{% if quotation.notes %}
+<section class="bg-surface-container-lowest border border-border-low-contrast rounded-xl p-6 animate-in" style="animation-delay: 250ms;">
+    <h3 class="font-headline-sm text-headline-sm text-on-surface mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-[20px] text-primary">sticky_note_2</span>
+        Vendor Notes
+    </h3>
+    <div class="font-body-md text-body-md text-on-surface-variant leading-relaxed whitespace-pre-line">{{ quotation.notes }}</div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% endwith %}
